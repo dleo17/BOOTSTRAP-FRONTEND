@@ -1,0 +1,10 @@
+.hero {
+  min-height: 70vh;
+  background: linear-gradient(180deg, #bfe3ff 0%, #a9d6ff 100%);
+  border-radius: 1.25rem;
+}
+.pill-btn { border-radius: 9999px; padding: .6rem 1.1rem; font-weight: 600; }
+.placeholder-box {
+  min-height: 160px; background:#f8f9fa; border:1px dashed #ced4da; border-radius:.75rem;
+}
+#mapBox { height: 360px; background:#eef2f6; border-radius:.75rem; }
