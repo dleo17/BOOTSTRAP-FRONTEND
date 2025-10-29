@@ -11,9 +11,124 @@
   <!-- Dein globales Styling -->
   <link href="styles.css" rel="stylesheet">
 
+  <style>
+    body {
+      background: linear-gradient(135deg, #e8f0ff, #f9fbff);
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      color: #1a1a1a;
+    }
+
+    /* --- HERO / Header --- */
+    .hero-card {
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 1.2rem;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 1.2rem 2rem rgba(13, 110, 253, 0.15),
+                  0 0 40px rgba(13, 110, 253, 0.08);
+      padding: 3rem 2rem 2.5rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .headline {
+      font-weight: 700;
+      color: #0d47a1;
+      text-shadow: 0 2px 6px rgba(13, 110, 253, 0.25);
+    }
+
+    .intro-text {
+      color: #5a6575;
+      font-size: 1.05rem;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+    }
+
+    /* --- GRID / Features --- */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .feature-tile {
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(13, 110, 253, 0.12);
+      border-radius: 1rem;
+      padding: 1.5rem 1.25rem;
+      box-shadow: 0 1rem 2rem rgba(13, 110, 253, 0.15);
+      transition: all 0.25s ease;
+    }
+
+    .feature-tile:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 1.4rem 2.2rem rgba(13, 110, 253, 0.25);
+    }
+
+    .feature-icon {
+      font-size: 2rem;
+      margin-right: 0.75rem;
+      color: #0d6efd;
+    }
+
+    .feature-headline {
+      font-weight: 600;
+      font-size: 1.1rem;
+      color: #0d47a1;
+      margin-bottom: 0.25rem;
+    }
+
+    .feature-desc {
+      font-size: 0.9rem;
+      color: #4a5568;
+    }
+
+    .feature-btn {
+      border-radius: 0.8rem;
+      font-weight: 600;
+      font-size: 0.9rem;
+      padding: 0.7rem 1rem;
+      background: linear-gradient(135deg, #0d6efd, #5fa8ff);
+      border: none;
+      box-shadow: 0 0.5rem 1rem rgba(13, 110, 253, 0.3);
+      transition: all 0.25s ease;
+    }
+
+    .feature-btn:hover {
+      transform: scale(1.03);
+      background: linear-gradient(135deg, #5fa8ff, #0d6efd);
+      box-shadow: 0 0.8rem 1.5rem rgba(13, 110, 253, 0.45);
+    }
+
+    /* --- Lieblingsort / Map --- */
+    .map-tile {
+      grid-column: 1 / -1;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 1rem;
+      border: 1px solid rgba(13, 110, 253, 0.15);
+      box-shadow: 0 1rem 2rem rgba(13, 110, 253, 0.15);
+      padding: 1.75rem 1.5rem;
+      max-width: 900px;
+      margin: 2rem auto 0;
+    }
+
+    .map-tile .feature-icon {
+      font-size: 2.2rem;
+    }
+
+    /* Responsive Text-Alignment */
+    @media (max-width: 768px) {
+      .headline {
+        font-size: 1.75rem;
+      }
+      .intro-text {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
 </head>
 
-<body data-page="home" class="bg-light">
+<body data-page="home">
   <div id="site-nav"></div>
 
   <main class="container py-5">
@@ -28,83 +143,91 @@
         </p>
 
         <!-- Features Grid -->
-        <<!-- Features Grid -->
-<div class="feature-grid">
+        <div class="feature-grid text-start">
 
-  <!-- Katze -->
-  <div class="feature-tile">
-    <div class="d-flex align-items-start mb-3">
-      <div class="feature-icon">🐱</div>
-      <div>
-        <div class="feature-headline">Zufällige Katze</div>
-        <div class="feature-desc">
-          Holt dir per Klick ein echtes Katzenbild aus einer öffentlichen API.
+          <!-- Katze -->
+          <div class="feature-tile d-flex flex-column h-100">
+            <div class="d-flex align-items-start mb-3">
+              <div class="feature-icon">🐱</div>
+              <div>
+                <div class="feature-headline">Zufällige Katze</div>
+                <div class="feature-desc">
+                  Holt dir per Klick ein echtes Katzenbild aus einer öffentlichen API.
+                </div>
+              </div>
+            </div>
+            <div class="mt-auto">
+              <a class="btn feature-btn w-100" href="cat.html">Katze anzeigen</a>
+            </div>
+          </div>
+
+          <!-- Wetter -->
+          <div class="feature-tile d-flex flex-column h-100">
+            <div class="d-flex align-items-start mb-3">
+              <div class="feature-icon">🌦</div>
+              <div>
+                <div class="feature-headline">Aktuelles Wetter</div>
+                <div class="feature-desc">
+                  Live-Temperatur, Niederschlag für Zürich und ein Vorhersage-Chart (5 Tage).
+                </div>
+              </div>
+            </div>
+            <div class="mt-auto">
+              <a class="btn feature-btn w-100" href="weather.html">Wetter öffnen</a>
+            </div>
+          </div>
+
+          <!-- Bitcoin -->
+          <div class="feature-tile d-flex flex-column h-100">
+            <div class="d-flex align-items-start mb-3">
+              <div class="feature-icon">₿</div>
+              <div>
+                <div class="feature-headline">Bitcoin Preis</div>
+                <div class="feature-desc">
+                  Frischer BTC-Preis in USD & CHF, direkt von CoinGecko – ohne API-Key.
+                </div>
+              </div>
+            </div>
+            <div class="mt-auto">
+              <a class="btn feature-btn w-100" href="btc.html">Bitcoin ansehen</a>
+            </div>
+          </div>
+
+          <!-- Ladestationen -->
+          <div class="feature-tile d-flex flex-column h-100">
+            <div class="d-flex align-items-start mb-3">
+              <div class="feature-icon">🔌</div>
+              <div>
+                <div class="feature-headline">E-Ladestationen</div>
+                <div class="feature-desc">
+                  Zeigt dir die nächsten Ladestationen (Top 5), nach Distanz sortiert.
+                  Suche auch per PLZ.
+                </div>
+              </div>
+            </div>
+            <div class="mt-auto">
+              <a class="btn feature-btn w-100" href="ev.html">Ladestationen finden</a>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
-    <a class="btn feature-btn w-100" href="cat.html">Katze anzeigen</a>
-  </div>
 
-  <!-- Wetter -->
-  <div class="feature-tile">
-    <div class="d-flex align-items-start mb-3">
-      <div class="feature-icon">🌦</div>
-      <div>
-        <div class="feature-headline">Aktuelles Wetter</div>
-        <div class="feature-desc">
-          Live-Temperatur, Niederschlag für Zürich und ein Vorhersage-Chart (5 Tage).
+        <!-- Karte -->
+        <div class="map-tile mt-4 text-start">
+          <div class="d-flex align-items-start mb-3">
+            <div class="feature-icon">📍</div>
+            <div>
+              <div class="feature-headline">Mein Lieblings-Ort</div>
+              <div class="feature-desc">
+                Interaktive Karte mit Leaflet und offiziellen Schweizer Kartenkacheln.
+                Fokus auf deinem Schulstandort (BBW).
+              </div>
+            </div>
+          </div>
+          <div>
+            <a class="btn feature-btn w-100" href="map.html">Karte anzeigen</a>
+          </div>
         </div>
-      </div>
-    </div>
-    <a class="btn feature-btn w-100" href="weather.html">Wetter öffnen</a>
-  </div>
 
-  <!-- Bitcoin -->
-  <div class="feature-tile">
-    <div class="d-flex align-items-start mb-3">
-      <div class="feature-icon">₿</div>
-      <div>
-        <div class="feature-headline">Bitcoin Preis</div>
-        <div class="feature-desc">
-          Frischer BTC-Preis in USD & CHF, direkt von CoinGecko – ohne API-Key.
-        </div>
-      </div>
-    </div>
-    <a class="btn feature-btn w-100" href="btc.html">Bitcoin ansehen</a>
-  </div>
-
-  <!-- Ladestationen -->
-  <div class="feature-tile">
-    <div class="d-flex align-items-start mb-3">
-      <div class="feature-icon">🔌</div>
-      <div>
-        <div class="feature-headline">E-Ladestationen</div>
-        <div class="feature-desc">
-          Zeigt dir die nächsten Ladestationen (Top 5), nach Distanz sortiert.
-          Suche auch per PLZ.
-        </div>
-      </div>
-    </div>
-    <a class="btn feature-btn w-100" href="ev.html">Ladestationen finden</a>
-  </div>
-
-  <!-- Karte -->
-  <div class="feature-tile">
-    <div class="d-flex align-items-start mb-3">
-      <div class="feature-icon">📍</div>
-      <div>
-        <div class="feature-headline">Mein Lieblings-Ort</div>
-        <div class="feature-desc">
-          Interaktive Karte mit Leaflet und offiziellen Schweizer Kartenkacheln.
-          Fokus auf deinem Schulstandort (BBW).
-        </div>
-      </div>
-    </div>
-    <a class="btn feature-btn w-100" href="map.html">Karte anzeigen</a>
-  </div>
-
-</div>
-<!-- /feature-grid -->
       </div>
     </section>
   </main>
