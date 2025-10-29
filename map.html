@@ -4,8 +4,30 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Mein Lieblings-Ort – Info Website 2025</title>
+
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="styles.css" rel="stylesheet">
+
+  <!-- Leaflet CSS (für Karte) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <style>
+    /* Karte soll eine fixe Höhe haben */
+    #mapBox {
+      width: 100%;
+      height: 400px;
+      border-radius: .5rem;
+      background: #eef2f6;
+      border: 1px solid rgba(0,0,0,.1);
+      overflow: hidden;
+    }
+  </style>
 </head>
 <body data-page="map" class="bg-light">
   <div id="site-nav"></div>
@@ -19,20 +41,77 @@
 
     <div class="card shadow-sm">
       <div class="card-body">
-        <div id="mapBox" class="mt-2 d-flex align-items-center justify-content-center">
-          <span class="text-muted">Karte folgt…</span>
+        <div id="mapBox" class="d-flex align-items-center justify-content-center text-muted">
+          Karte folgt…
         </div>
       </div>
     </div>
   </main>
 
+  <!-- jQuery, Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Leaflet JS -->
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <!-- Deine gemeinsame Logik (Nav usw.) -->
   <script src="app.js"></script>
+
   <script>
-    // Dummy – später Leaflet + OSM
+  // Fester Lieblingsort (BBW – Pionierstrasse 28, Winterthur)
+  const FAV_LAT = 47.498311992166585;   // exakte Koordinaten BBW Winterthur
+  const FAV_LON = 8.719900186507994;
+  const FAV_LABEL = "Mein Lieblings-Ort: BBW Pionierstrasse 28, Winterthur 🏫";
+
+    let mapInstance = null; // wir merken uns die Karte, damit wir sie nicht doppelt initialisieren
+
     $('#btnMap').on('click', function () {
-      $('#mapBox').html('<div class="p-3">[Hier kommt später Leaflet + OpenStreetMap mit Marker]</div>');
+      const $mapBox = $('#mapBox');
+
+      // Falls Karte schon existiert -> nichts neu bauen
+      if (mapInstance) {
+        // kleine Animation als Feedback
+        $mapBox.addClass('ring').delay(300).queue(function(next){
+          $mapBox.removeClass('ring');
+          next();
+        });
+        return;
+      }
+
+      // Platzhalter-Text raus, echtes DIV für Leaflet rein
+      $mapBox
+        .removeClass('d-flex align-items-center justify-content-center text-muted')
+        .text('') // leeren
+        .append('<div id="leafletMap" style="width:100%;height:100%;"></div>');
+
+      // Leaflet Map initialisieren
+      mapInstance = L.map('leafletMap').setView([FAV_LAT, FAV_LON], 16);
+
+      // Hintergrund-Kartenlayer vom Bund (api3.geo.admin.ch)
+      // Wir nehmen hier swisstopo webmercator tiles. Das ist öffentlich nutzbar,
+      // Doku: https://api3.geo.admin.ch/index.html  (WMTS / tiles)
+      //
+      // WICHTIG: Diese Tile-URL ist der Standard XYZ Endpunkt der Bundeskarte in Web-Mercator.
+      // Wir nutzen hier ch.swisstopo.pixelkarte-farbe als Layer (bunt / Strassenkarte).
+      //
+      const swissTopoLayer = L.tileLayer(
+        'https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg',
+        {
+          attribution: '© swisstopo, Bundesamt für Landestopografie | api3.geo.admin.ch',
+          maxZoom: 19,
+          minZoom: 0
+        }
+      );
+      swissTopoLayer.addTo(mapInstance);
+
+      // Marker setzen
+      const marker = L.marker([FAV_LAT, FAV_LON]).addTo(mapInstance);
+      marker.bindPopup(`<strong>${FAV_LABEL}</strong><br>${FAV_LAT.toFixed(5)}, ${FAV_LON.toFixed(5)}`).openPopup();
     });
   </script>
 </body>
