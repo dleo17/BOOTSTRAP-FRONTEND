@@ -4,180 +4,400 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Strom-Tankstellen – Info Website 2025</title>
+
+  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Dein globales Styling -->
   <link href="styles.css" rel="stylesheet">
+
+  <style>
+    /* leichte visuelle Politur */
+    .section-header {
+      text-align: center;
+    }
+    .section-header .headline {
+      font-weight: 600;
+    }
+    .section-header .subline {
+      color: #6c757d;
+      font-size: .95rem;
+      max-width: 480px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .controls-wrapper {
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: .75rem;
+      box-shadow: 0 1rem 2rem rgba(0,0,0,.05);
+      padding: 1rem 1.25rem;
+    }
+
+    .station-card {
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.07);
+      border-radius: .75rem;
+      padding: .75rem 1rem;
+      box-shadow: 0 .5rem 1rem rgba(0,0,0,.04);
+    }
+
+    .station-rank {
+      width: 2rem;
+      height: 2rem;
+      font-size: .9rem;
+      font-weight: 600;
+      background: #0d6efd;
+      color: #fff;
+      border-radius: .5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .distance-badge {
+      font-size: .75rem;
+      font-weight: 500;
+      background-color: rgba(13,110,253,.08);
+      color: #0d6efd;
+      border-radius: .4rem;
+      padding: .25rem .5rem;
+      display: inline-block;
+    }
+
+    .status-line {
+      font-size: .8rem;
+      color: #6c757d;
+      min-height: 1.2em;
+    }
+
+    .error-text {
+      color: #dc3545;
+      font-weight: 500;
+    }
+
+    ol#evList {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0;
+    }
+
+    .divider-line {
+      border-top: 1px solid rgba(0,0,0,.08);
+      margin: 1rem 0 0 0;
+    }
+
+    @media (min-width: 576px) {
+      .inputs-flex {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        justify-content: center;
+      }
+    }
+  </style>
 </head>
+
 <body data-page="ev" class="bg-light">
   <div id="site-nav"></div>
 
   <main class="container my-4">
-    <h1 class="display-6 fw-bold mb-4 text-center">Strom-Tankstellen in der Nähe</h1>
 
-    <div class="text-center mb-3">
-      <button id="btnEv" class="btn btn-primary pill-btn">Top 5 anzeigen</button>
-    </div>
+    <!-- Titel / Intro -->
+    <header class="section-header mb-4">
+      <h1 class="headline display-6 mb-2">Strom-Tankstellen in der Nähe</h1>
+      <p class="subline">
+        Finde die nächstgelegenen öffentlichen Ladestationen für Elektroautos. Entweder um Winterthur herum
+        oder rund um eine beliebige Schweizer PLZ.
+      </p>
+    </header>
 
-    <div class="card shadow-sm">
+    <!-- Steuerung -->
+    <section class="controls-wrapper mb-4">
+      <div class="row gy-3 align-items-center justify-content-center">
+        <!-- Button Winterthur -->
+        <div class="col-12 col-lg-auto text-center">
+          <button id="btnEv" class="btn btn-primary pill-btn w-100">
+            🔌 Top&nbsp;5 um Winterthur
+          </button>
+          <div class="form-text">
+            Nutzt Winterthur (47.4988 / 8.7237) als Zentrum
+          </div>
+        </div>
+
+        <!-- PLZ Suche -->
+        <div class="col-12 col-lg-auto">
+          <div class="inputs-flex">
+            <div class="flex-grow-1" style="min-width:220px;">
+              <label for="plzInput" class="form-label mb-1 fw-semibold small text-muted">
+                PLZ wählen
+              </label>
+              <div class="input-group">
+                <input id="plzInput" type="text" class="form-control" placeholder="z.B. 8400">
+                <button id="btnPlz" class="btn btn-outline-primary">
+                  🔍 Suchen
+                </button>
+              </div>
+              <div class="form-text">
+                Zeigt die Top&nbsp;5 Ladestationen nahe dieser PLZ
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Result -->
+    <section class="card shadow-sm">
       <div class="card-body">
-        <div id="evResult" class="placeholder-box p-3">
+        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-start mb-3">
+          <div>
+            <div class="fw-semibold">Ergebnisse</div>
+            <div id="statusLine" class="status-line">Noch nichts geladen…</div>
+          </div>
+        </div>
+
+        <div id="evResult">
           <ol id="evList" class="mb-0">
-            <!-- Liste kommt hier hin -->
+            <!-- Dynamische Liste -->
           </ol>
         </div>
       </div>
-    </div>
+    </section>
   </main>
 
+  <!-- JS libs -->
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="app.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="app.js"></script>
 
-<script>
-  const WINT_LAT = 47.4988;  // Winterthur
-  const WINT_LON = 8.7237;
+  <script>
+    // Fixer Referenzpunkt Winterthur
+    const WINT_LAT = 47.4988;
+    const WINT_LON = 8.7237;
 
-  function distanceKm(lat1, lon1, lat2, lon2) {
-    const R = 6371;
-    const toRad = deg => deg * Math.PI / 180;
-    const dLat = toRad(lat2 - lat1);
-    const dLon = toRad(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-      Math.sin(dLon / 2) ** 2;
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c;
-  }
-
-  function cleanName(nameRaw) {
-    if (!nameRaw) return 'Unbenannte Ladestation';
-    // alles ab "(" wegschneiden, z.B. "(nicht öffnen)"
-    const idx = nameRaw.indexOf('(');
-    if (idx !== -1) {
-      return nameRaw.slice(0, idx).trim();
+    // Distanz in km (Haversine)
+    function distanceKm(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const toRad = deg => deg * Math.PI / 180;
+      const dLat = toRad(lat2 - lat1);
+      const dLon = toRad(lon2 - lon1);
+      const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+        Math.sin(dLon / 2) ** 2;
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
     }
-    return nameRaw.trim();
-  }
 
-  $('#btnEv').on('click', function () {
-    const $list = $('#evList');
-    $list.html('<li class="text-muted">Lade Ladestationen…</li>');
+    // Namen säubern (entfernt z. B. "(nicht öffnen)")
+    function cleanName(nameRaw) {
+      if (!nameRaw) return 'Unbenannte Ladestation';
+      const idx = nameRaw.indexOf('(');
+      if (idx !== -1) {
+        return nameRaw.slice(0, idx).trim();
+      }
+      return nameRaw.trim();
+    }
 
-    const url = 'https://data.geo.admin.ch/ch.bfe.ladestellen-elektromobilitaet/data/ch.bfe.ladestellen-elektromobilitaet.json';
+    // Datensatz holen & normalisieren
+    function fetchStations(callback) {
+      const url = 'https://data.geo.admin.ch/ch.bfe.ladestellen-elektromobilitaet/data/ch.bfe.ladestellen-elektromobilitaet.json';
 
-    $.getJSON(url)
-      .done(function(data) {
-        if (!data || !Array.isArray(data.EVSEData)) {
-          $list.html('<li class="text-danger">Datenformat unerwartet: kein EVSEData 🤨</li>');
-          return;
-        }
-
-        // Alle einzelnen Säulen einsammeln
-        const records = [];
-        data.EVSEData.forEach(block => {
-          if (Array.isArray(block.EVSEDataRecord)) {
-            block.EVSEDataRecord.forEach(rec => {
-              records.push(rec);
-            });
+      $.getJSON(url)
+        .done(function(data) {
+          if (!data || !Array.isArray(data.EVSEData)) {
+            callback(new Error('Datenformat unerwartet (kein EVSEData)'), null);
+            return;
           }
-        });
 
-        if (!records.length) {
-          $list.html('<li class="text-danger">Keine Ladestationen gefunden 😕</li>');
-          return;
-        }
-
-        // in ein einheitliches Format bringen
-        const normalized = records.map(rec => {
-          // Koordinaten aus "GeoCoordinates.Google": "LAT LON"
-          let latGuess = null;
-          let lonGuess = null;
-          if (typeof rec.GeoCoordinates?.Google === 'string') {
-            const parts = rec.GeoCoordinates.Google.trim().split(' ');
-            if (parts.length === 2) {
-              latGuess = parseFloat(parts[0]);
-              lonGuess = parseFloat(parts[1]);
+          // Alle EVSEDataRecord aus allen Blöcken einsammeln
+          const records = [];
+          data.EVSEData.forEach(block => {
+            if (Array.isArray(block.EVSEDataRecord)) {
+              block.EVSEDataRecord.forEach(rec => {
+                records.push(rec);
+              });
             }
+          });
+
+          if (!records.length) {
+            callback(new Error('Keine Ladestationen gefunden'), null);
+            return;
           }
 
-          // Name
-          let stationName = '';
-          if (Array.isArray(rec.ChargingStationNames) && rec.ChargingStationNames.length > 0) {
-            const deName = rec.ChargingStationNames.find(n => n.lang === 'de');
-            stationName = deName ? deName.value : rec.ChargingStationNames[0].value;
+          // normalisieren
+          const normalized = records.map(rec => {
+            // Koordinaten kommen als String "LAT LON" unter rec.GeoCoordinates.Google
+            let latGuess = null;
+            let lonGuess = null;
+            if (typeof rec.GeoCoordinates?.Google === 'string') {
+              const parts = rec.GeoCoordinates.Google.trim().split(' ');
+              if (parts.length === 2) {
+                latGuess = parseFloat(parts[0]);
+                lonGuess = parseFloat(parts[1]);
+              }
+            }
+
+            // Name (bevorzugt deutsch)
+            let stationName = '';
+            if (Array.isArray(rec.ChargingStationNames) && rec.ChargingStationNames.length > 0) {
+              const deName = rec.ChargingStationNames.find(n => n.lang === 'de');
+              stationName = deName ? deName.value : rec.ChargingStationNames[0].value;
+            }
+            if (!stationName) {
+              stationName =
+                rec.ChargingStationName ||
+                rec.StationName ||
+                rec.OperatorName ||
+                rec.EVSEID ||
+                'Unbenannte Ladestation';
+            }
+            stationName = cleanName(stationName);
+
+            // Adresse
+            const street = rec.Address?.Street || rec.Address?.StreetName || '';
+            const houseNo = rec.Address?.HouseNumber || rec.Address?.HouseNo || '';
+            const zip = rec.Address?.PostalCode || rec.Address?.ZipCode || rec.Address?.Postcode || '';
+            const city = rec.Address?.City || rec.Address?.Town || rec.Address?.Locality || '';
+
+            const line1 = [street, houseNo].filter(Boolean).join(' ');
+            const line2 = [zip, city].filter(Boolean).join(' ');
+            const fullAddress = [line1, line2].filter(Boolean).join(', ');
+
+            return {
+              lat: latGuess,
+              lon: lonGuess,
+              name: stationName,
+              address: fullAddress || 'Adresse unbekannt',
+              zip: zip || '',
+              city: city || ''
+            };
+          }).filter(s => s.lat != null && s.lon != null);
+
+          if (!normalized.length) {
+            callback(new Error('Keine Stationen mit Koordinaten gefunden'), null);
+            return;
           }
-          if (!stationName) {
-            stationName =
-              rec.ChargingStationName ||
-              rec.StationName ||
-              rec.OperatorName ||
-              rec.EVSEID ||
-              'Unbenannte Ladestation';
-          }
-          stationName = cleanName(stationName);
 
-          // Adresse
-          const street = rec.Address?.Street || rec.Address?.StreetName || '';
-          const houseNo = rec.Address?.HouseNumber || rec.Address?.HouseNo || '';
-          const zip = rec.Address?.PostalCode || rec.Address?.ZipCode || rec.Address?.Postcode || '';
-          const city = rec.Address?.City || rec.Address?.Town || rec.Address?.Locality || '';
+          callback(null, normalized);
+        })
+        .fail(function(xhr, status, err) {
+          console.error('Request-Fehler:', status, err, xhr);
+          callback(new Error('Netzwerkfehler beim Laden 😢'), null);
+        });
+    }
 
-          const line1 = [street, houseNo].filter(Boolean).join(' ');
-          const line2 = [zip, city].filter(Boolean).join(', ');
-          const fullAddress = [line1, line2].filter(Boolean).join(', ');
+    // Rendert die Liste hübsch
+    function renderTop5($list, stationsWithDistance, titleExtra) {
+      if (!stationsWithDistance.length) {
+        $list.html('<li class="error-text">Keine Resultate 😕</li>');
+        $('#statusLine').text('Keine Resultate gefunden.');
+        return;
+      }
 
-          // Distanz
-          const distKm = (latGuess != null && lonGuess != null)
-              ? distanceKm(WINT_LAT, WINT_LON, latGuess, lonGuess)
-              : Infinity;
+      // sortieren & Top 5
+      stationsWithDistance.sort((a, b) => a.distance - b.distance);
+      const top5 = stationsWithDistance.slice(0, 5);
 
-          return {
-            name: stationName,
-            address: fullAddress || 'Adresse unbekannt',
-            distance: distKm
-          };
-        }).filter(s => s.distance !== Infinity);
-
-        if (!normalized.length) {
-          $list.html('<li class="text-danger">Keine Stationen mit gültigen Koordinaten gefunden 😕</li>');
-          return;
-        }
-
-        // Sortieren + Top 5
-        normalized.sort((a, b) => a.distance - b.distance);
-        const top5 = normalized.slice(0, 5);
-
-        // Hübsches HTML bauen
-        const html = top5.map((st, i) => `
-          <li class="mb-3">
-            <div class="d-flex flex-column flex-sm-row align-items-sm-start">
-              <div class="me-sm-3 fw-bold">${i + 1}.</div>
+      // HTML Karten
+      const html = top5.map((st, i) => `
+        <li class="mb-3">
+          <div class="station-card">
+            <div class="d-flex flex-row flex-nowrap align-items-start gap-3">
+              <div class="station-rank flex-shrink-0">${i + 1}</div>
               <div class="flex-grow-1">
                 <div class="fw-semibold">${st.name}</div>
                 <div class="text-muted small">${st.address}</div>
-                <div class="mt-1">
-                  <span class="badge bg-secondary-subtle text-secondary-emphasis">
+                <div class="mt-2">
+                  <span class="distance-badge">
                     ~ ${st.distance.toFixed(2)} km entfernt
                   </span>
                 </div>
               </div>
             </div>
-            <hr class="mt-3 mb-0" />
-          </li>
-        `).join('');
+          </div>
+        </li>
+      `).join('');
 
-        $list.html(html);
-        // letztes <hr> entfernen für schönere Optik
-        $('#evList hr').last().remove();
-      })
-      .fail(function(xhr, status, err) {
-        console.error('Request-Fehler:', status, err, xhr);
-        $list.html('<li class="text-danger">Fehler beim Laden der Daten (Netzwerk/CORS)</li>');
+      $list.html(html);
+
+      // Status aktualisieren
+      $('#statusLine').text(titleExtra || 'Ergebnisse geladen.');
+    }
+
+    // Button: Top 5 um Winterthur
+    $('#btnEv').on('click', function () {
+      const $list = $('#evList');
+      $('#statusLine').text('Suche Ladestationen rund um Winterthur …');
+      $list.html('<li class="text-muted">Lade…</li>');
+
+      fetchStations(function(err, stations) {
+        if (err) {
+          $list.html('<li class="error-text">' + err.message + '</li>');
+          $('#statusLine').text('Fehler beim Laden 😢');
+          return;
+        }
+
+        const withDistance = stations.map(s => {
+          const distKm = distanceKm(WINT_LAT, WINT_LON, s.lat, s.lon);
+          return { ...s, distance: distKm };
+        });
+
+        renderTop5($list, withDistance, 'Top 5 Ladestationen um Winterthur');
       });
-  });
-</script>
+    });
+
+    // Button: Nach PLZ suchen
+    $('#btnPlz').on('click', function () {
+      const $list = $('#evList');
+      const plzRaw = $('#plzInput').val().trim();
+
+      if (!plzRaw) {
+        $list.html('<li class="error-text">Bitte zuerst eine PLZ eingeben 🙃</li>');
+        $('#statusLine').text('Fehlende PLZ.');
+        return;
+      }
+
+      $('#statusLine').text('Suche Ladestationen für PLZ ' + plzRaw + ' …');
+      $list.html('<li class="text-muted">Lade…</li>');
+
+      fetchStations(function(err, stations) {
+        if (err) {
+          $list.html('<li class="error-text">' + err.message + '</li>');
+          $('#statusLine').text('Fehler beim Laden 😢');
+          return;
+        }
+
+        // Alle Stationen mit dieser PLZ
+        const sameZip = stations.filter(s => s.zip === plzRaw);
+
+        if (!sameZip.length) {
+          $list.html('<li class="error-text">Keine Station direkt in dieser PLZ gefunden 🤔</li>');
+          $('#statusLine').text('Keine Station in PLZ ' + plzRaw + ' gefunden.');
+          return;
+        }
+
+        // Wir nehmen die erste Station der PLZ als Referenzpunkt
+        const refLat = sameZip[0].lat;
+        const refLon = sameZip[0].lon;
+
+        // Distanz ALLER Stationen zu diesem Referenzpunkt
+        const withDistance = stations.map(s => {
+          const distKm = distanceKm(refLat, refLon, s.lat, s.lon);
+          return { ...s, distance: distKm };
+        });
+
+        renderTop5(
+          $list,
+          withDistance,
+          'Top 5 Ladestationen nahe PLZ ' + plzRaw
+        );
+      });
+    });
+
+  </script>
 </body>
 </html>
