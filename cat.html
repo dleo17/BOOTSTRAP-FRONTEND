@@ -29,11 +29,22 @@
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="app.js"></script>
-  <script>
-    // später echte API – vorerst Dummy
-    $('#btnCat').on('click', function () {
-      $('#catResult').html('<div class="p-3 text-center">[Hier wird später ein Katzenbild von TheCatAPI gerendert]</div>');
-    });
-  </script>
+<script>
+  // 🐱 Zufälliges Katzenbild via TheCatAPI
+  $('#btnCat').on('click', function () {
+    const out = $('#catResult').html('<span class="text-muted">Lade...</span>');
+    $.getJSON('https://api.thecatapi.com/v1/images/search')
+      .done(data => {
+        if (data && data[0] && data[0].url) {
+          out.html(`<img src="${data[0].url}" alt="Random cat" class="img-fluid rounded shadow">`);
+        } else {
+          out.html('<div class="text-danger">Kein Bild gefunden 🐱</div>');
+        }
+      })
+      .fail(() => {
+        out.html('<div class="text-danger">Fehler beim Laden des Katzenbildes 😿</div>');
+      });
+  });
+</script>
 </body>
 </html>
