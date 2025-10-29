@@ -7,58 +7,188 @@
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Global Styles -->
   <link href="styles.css" rel="stylesheet">
 
   <style>
+    body {
+      background: linear-gradient(135deg, #e8f0ff 0%, #f7f9ff 60%);
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #0d47a1;
+      text-shadow: 0 2px 6px rgba(13, 110, 253, 0.25);
+    }
+
+    .weather-card,
+    .chart-card {
+      border-radius: 1rem;
+      border: none;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 1rem 2rem rgba(13, 110, 253, 0.15),
+        0 0 20px rgba(13, 110, 253, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .pill-btn-main {
+      border-radius: 50px;
+      padding: 0.8rem 1.8rem;
+      font-weight: 600;
+      font-size: 1rem;
+      background: linear-gradient(135deg, #0d6efd, #5fa8ff);
+      border: none;
+      box-shadow: 0 .6rem 1.2rem rgba(13,110,253,0.35);
+      transition: all 0.25s ease;
+      color: #fff;
+    }
+
+    .pill-btn-main:hover {
+      background: linear-gradient(135deg, #5fa8ff, #0d6efd);
+      transform: scale(1.05);
+      box-shadow: 0 1.2rem 2rem rgba(13,110,253,0.45);
+      color: #fff;
+    }
+
+    .pill-btn-small {
+      border-radius: 9999px;
+      font-size: .8rem;
+      font-weight: 600;
+      background: rgba(13,110,253,.08);
+      color: #0d6efd;
+      border: 1px solid rgba(13,110,253,.4);
+      padding: .5rem .9rem;
+      box-shadow: 0 .5rem 1rem rgba(13,110,253,.15);
+    }
+
+    .pill-btn-small:hover {
+      background: rgba(13,110,253,.12);
+      color: #0b5ed7;
+      box-shadow: 0 .8rem 1.4rem rgba(13,110,253,.22);
+    }
+
+    #weatherResult {
+      background: rgba(245, 248, 255, 0.8);
+      border-radius: .8rem;
+      min-height: 120px;
+      border: 1px dashed rgba(13,110,253,.3);
+      box-shadow: inset 0 0 10px rgba(13, 110, 253, 0.15);
+      padding: 1rem 1.25rem;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    /* Chart container */
     #weatherChart {
       width: 100%;
       height: 320px;
-      border: 1px solid rgba(0,0,0,.1);
-      border-radius: .5rem;
-      background: #fff;
+      border-radius: .8rem;
+      background: rgba(245, 248, 255, 0.8);
+      border: 1px solid rgba(13,110,253,.15);
+      box-shadow:
+        inset 0 0 10px rgba(13, 110, 253, 0.15),
+        0 1rem 2rem rgba(13,110,253,.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #6c757d;
+      text-align: center;
+      padding: 1rem;
+    }
+
+    .chart-header-row {
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+    }
+
+    @media (min-width: 768px) {
+      .chart-header-row {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .chart-meta {
+      font-size: .8rem;
+      color: #6c757d;
+    }
+
+    #chartStatus {
+      font-size: .8rem;
+      font-weight: 500;
+      color: #6c757d;
+    }
+
+    #chartStatus.ready {
+      color: #198754;
+      text-shadow: 0 0 8px rgba(25, 135, 84, .4);
+    }
+
+    .source-line {
+      font-size: .75rem;
+      color: #6c757d;
+      text-align: center;
     }
   </style>
 </head>
+
 <body data-page="weather" class="bg-light">
   <div id="site-nav"></div>
 
-  <main class="container my-4">
-    <h1 class="display-6 fw-bold mb-4 text-center">Aktuelles Live Wetter</h1>
+  <main class="container py-5">
+    <h1 class="display-6 fw-bold mb-3 text-center">🌦 Aktuelles Live Wetter</h1>
+    <p class="text-center text-muted mb-4">
+      Standort: Zürich (47.3769 / 8.5417). Echte Wetterdaten aus der Open-Meteo API.
+    </p>
 
     <!-- Abschnitt 1: Heutige Werte -->
-    <div class="text-center mb-3">
-      <button id="btnWeather" class="btn btn-primary pill-btn">Wetter anzeigen</button>
+    <div class="text-center mb-4">
+      <button id="btnWeather" class="btn pill-btn-main">
+        Heutiges Wetter laden
+      </button>
     </div>
 
-    <div class="card shadow-sm mb-4">
+    <div class="weather-card shadow-lg mb-5">
       <div class="card-body">
-        <div id="weatherResult" class="placeholder-box p-3">
-          <span class="text-muted">Wetterdaten folgen…</span>
+        <div id="weatherResult" class="text-muted d-flex align-items-center justify-content-center">
+          <span>Wetterdaten folgen…</span>
         </div>
       </div>
     </div>
 
     <!-- Abschnitt 2: Diagramm -->
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-3">
-          <h5 class="card-title mb-2 mb-md-0 fw-semibold">Vorhersage (nächste 5 Tage)</h5>
-          <button id="btnChart" class="btn btn-outline-primary btn-sm">Diagramm laden</button>
-        </div>
-
-        <div id="chartStatus" class="text-muted small mb-2">
-          Noch kein Diagramm geladen…
-        </div>
-
-        <div id="weatherChart" class="d-flex align-items-center justify-content-center text-muted">
-          Chart folgt…
-        </div>
-
-        <div class="text-muted small mt-3">
-          Temperatur (°C, Linie) &nbsp;|&nbsp; Niederschlag (mm, Säulen) &nbsp;|&nbsp; Datenquelle: Open-Meteo / MeteoSwiss
-        </div>
+    <!-- Abschnitt 2: Diagramm -->
+<div class="forecast-card shadow-lg">
+  <div class="forecast-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+    <div class="mb-3 mb-md-0">
+      <div class="forecast-title">Vorhersage (nächste 5 Tage)</div>
+      <div class="forecast-sub">
+        Temperatur (°C, Linie) · Niederschlag (mm, Säulen)
       </div>
     </div>
+
+    <div class="text-md-end">
+      <button id="btnChart" class="btn pill-btn-small w-100 w-md-auto">
+        Diagramm laden
+      </button>
+      <div id="chartStatus" class="chart-status mt-2">
+        Noch kein Diagramm geladen…
+      </div>
+    </div>
+  </div>
+
+  <div id="weatherChart" class="chart-area">
+    <span>Chart folgt…</span>
+  </div>
+
+  <div class="source-line text-center">
+    Datenquelle: Open-Meteo (hourly forecast, 5 Tage)
+  </div>
+</div>
 
   </main>
 
@@ -73,132 +203,171 @@
   <script src="app.js"></script>
 
   <script>
-  // Fixe Koordinaten Zürich
-  const LAT = 47.3769;
-  const LON = 8.5417;
+    // Fixe Koordinaten Zürich
+    const LAT = 47.3769;
+    const LON = 8.5417;
 
-  // =========================
-  // Teil 1: Tageswerte (heute)
-  // =========================
-  $('#btnWeather').on('click', function () {
-    const $out = $('#weatherResult');
-    $out.html('<span class="text-muted">Lade Wetterdaten…</span>');
+    // =========================
+    // Teil 1: Tageswerte (heute)
+    // =========================
+    $('#btnWeather').on('click', function () {
+      const $out = $('#weatherResult');
+      $out
+        .removeClass('text-danger')
+        .removeClass('text-muted')
+        .html('<span class="text-muted">Lade Wetterdaten…</span>');
 
-    const urlToday =
-      `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}` +
-      `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&forecast_days=1&timezone=Europe%2FZurich`;
+      const urlToday =
+        `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}` +
+        `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum&forecast_days=1&timezone=Europe%2FZurich`;
 
-    $.getJSON(urlToday)
-      .done(function(data) {
-        const daily = data.daily;
-        if (!daily) {
-          $out.html('<div class="text-danger">Keine Wetterdaten gefunden.</div>');
-          return;
-        }
+      $.getJSON(urlToday)
+        .done(function(data) {
+          const daily = data.daily;
+          if (!daily) {
+            $out
+              .addClass('text-danger')
+              .html('<div>Keine Wetterdaten gefunden.</div>');
+            return;
+          }
 
-        const tmax = daily.temperature_2m_max?.[0];
-        const tmin = daily.temperature_2m_min?.[0];
-        const rain = daily.precipitation_sum?.[0];
+          const tmax = daily.temperature_2m_max?.[0];
+          const tmin = daily.temperature_2m_min?.[0];
+          const rain = daily.precipitation_sum?.[0];
 
-        $out.html(`
-          <div>
-            <p class="mb-2"><strong>Ort:</strong> Zürich, CH</p>
-            <p class="mb-0">
-              Heute: Tmax ${tmax}°C,
-              Tmin ${tmin}°C,
-              Niederschlag ${rain} mm
-            </p>
-          </div>
-        `);
-      })
-      .fail(function() {
-        $out.html('<div class="text-danger">Fehler beim Abrufen der Wetterdaten.</div>');
-      });
-  });
-
-  // =====================================
-  // Teil 2: Highcharts 5-Tage-Vorhersage
-  // =====================================
-
-  $('#btnChart').on('click', function () {
-    const $status = $('#chartStatus');
-    $status.text('Lade Vorhersage…');
-
-    // Neue URL: normaler forecast-Endpoint statt meteoswiss
-    const url5days =
-      `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}` +
-      `&hourly=temperature_2m,precipitation&forecast_days=5&timezone=Europe%2FZurich`;
-
-    $.getJSON(url5days)
-      .done(function(data) {
-        const hourly = data.hourly;
-        if (!hourly || !hourly.time || !hourly.temperature_2m || !hourly.precipitation) {
-          $status.text('Konnte Vorhersage nicht laden 😕');
-          return;
-        }
-
-        // Highcharts-Serien vorbereiten
-        const temperatureSeries = [];
-        const rainSeries = [];
-
-        for (let i = 0; i < hourly.time.length; i++) {
-          const ts = new Date(hourly.time[i]).getTime(); // ISO -> ms
-          const tempVal = hourly.temperature_2m[i];
-          const rainVal = hourly.precipitation[i];
-
-          temperatureSeries.push([ts, tempVal]);
-          rainSeries.push([ts, rainVal]);
-        }
-
-        Highcharts.chart('weatherChart', {
-          chart: {
-            zoomType: 'x',
-            backgroundColor: 'transparent'
-          },
-          title: {
-            text: 'Temperatur & Niederschlag (nächste 5 Tage)'
-          },
-          xAxis: {
-            type: 'datetime',
-            labels: { format: '{value:%d.%m %H:%M}' }
-          },
-          yAxis: [{
-            title: { text: 'Temperatur (°C)' },
-            opposite: false
-          }, {
-            title: { text: 'Niederschlag (mm)' },
-            opposite: true
-          }],
-          tooltip: {
-            shared: true,
-            xDateFormat: '%d.%m.%Y %H:%M',
-            headerFormat: '<b>{point.key}</b><br/>'
-          },
-          legend: {
-            layout: 'horizontal'
-          },
-          series: [
-            {
-              name: 'Temperatur (°C)',
-              type: 'spline',
-              data: temperatureSeries,
-              yAxis: 0
-            },
-            {
-              name: 'Niederschlag (mm)',
-              type: 'column',
-              data: rainSeries,
-              yAxis: 1
-            }
-          ]
+          $out.html(`
+            <div class="text-center text-md-start">
+              <div class="mb-2">
+                <span class="fw-semibold">Ort:</span>
+                <span>Zürich, CH</span>
+              </div>
+              <div class="mb-1">
+                <span class="fw-semibold">Maximal:</span>
+                <span>${tmax}°C</span>
+              </div>
+              <div class="mb-1">
+                <span class="fw-semibold">Minimal:</span>
+                <span>${tmin}°C</span>
+              </div>
+              <div class="mb-0">
+                <span class="fw-semibold">Niederschlag heute:</span>
+                <span>${rain} mm</span>
+              </div>
+            </div>
+          `);
+        })
+        .fail(function() {
+          $out
+            .addClass('text-danger')
+            .html('<div>Fehler beim Abrufen der Wetterdaten.</div>');
         });
+    });
 
-        $status.text('Diagramm geladen ✔');
-      })
-      .fail(function() {
-        $status.text('Fehler beim Laden der Vorhersage 😬');
-      });
-  });
-</script>
+    // =====================================
+    // Teil 2: Highcharts 5-Tage-Vorhersage
+    // =====================================
+
+    $('#btnChart').on('click', function () {
+      const $status = $('#chartStatus');
+      $status
+        .removeClass('ready')
+        .text('Lade Vorhersage…');
+
+      const url5days =
+        `https://api.open-meteo.com/v1/forecast?latitude=${LAT}&longitude=${LON}` +
+        `&hourly=temperature_2m,precipitation&forecast_days=5&timezone=Europe%2FZurich`;
+
+      $.getJSON(url5days)
+        .done(function(data) {
+          const hourly = data.hourly;
+          if (!hourly || !hourly.time || !hourly.temperature_2m || !hourly.precipitation) {
+            $status.text('Konnte Vorhersage nicht laden 😕');
+            return;
+          }
+
+          // Highcharts-Serien vorbereiten
+          const temperatureSeries = [];
+          const rainSeries = [];
+
+          for (let i = 0; i < hourly.time.length; i++) {
+            const ts = new Date(hourly.time[i]).getTime(); // ISO -> ms
+            const tempVal = hourly.temperature_2m[i];
+            const rainVal = hourly.precipitation[i];
+
+            temperatureSeries.push([ts, tempVal]);
+            rainSeries.push([ts, rainVal]);
+          }
+
+          Highcharts.chart('weatherChart', {
+            chart: {
+              zoomType: 'x',
+              backgroundColor: 'transparent'
+            },
+            title: {
+              text: 'Temperatur & Niederschlag (nächste 5 Tage)',
+              style: {
+                color: '#0d47a1',
+                textShadow: '0 1px 4px rgba(13,110,253,.3)',
+                fontWeight: '600'
+              }
+            },
+            xAxis: {
+              type: 'datetime',
+              labels: { format: '{value:%d.%m %H:%M}' },
+              crosshair: true,
+              lineColor: 'rgba(13,110,253,.4)',
+              tickColor: 'rgba(13,110,253,.4)'
+            },
+            yAxis: [{
+              title: { text: 'Temperatur (°C)' },
+              labels: { style: { color: '#0d6efd', fontWeight: '500' } },
+              lineColor: 'rgba(13,110,253,.4)',
+              gridLineColor: 'rgba(13,110,253,.07)'
+            }, {
+              title: { text: 'Niederschlag (mm)' },
+              labels: { style: { color: '#495057', fontWeight: '500' } },
+              opposite: true,
+              lineColor: 'rgba(108,117,125,.4)',
+              gridLineColor: 'rgba(13,110,253,.07)'
+            }],
+            tooltip: {
+              shared: true,
+              backgroundColor: 'rgba(255,255,255,0.95)',
+              borderColor: 'rgba(13,110,253,.4)',
+              borderRadius: 8,
+              style: { color: '#1b2a4e' },
+              xDateFormat: '%d.%m.%Y %H:%M',
+              headerFormat: '<span style="font-weight:600">{point.key}</span><br/>'
+            },
+            legend: {
+              layout: 'horizontal'
+            },
+            series: [
+              {
+                name: 'Temperatur (°C)',
+                type: 'spline',
+                data: temperatureSeries,
+                yAxis: 0
+              },
+              {
+                name: 'Niederschlag (mm)',
+                type: 'column',
+                data: rainSeries,
+                yAxis: 1
+              }
+            ]
+          });
+
+          $status
+            .addClass('ready')
+            .text('Diagramm geladen ✔');
+        })
+        .fail(function() {
+          $status
+            .removeClass('ready')
+            .text('Fehler beim Laden der Vorhersage 😬');
+        });
+    });
+  </script>
 </body>
 </html>

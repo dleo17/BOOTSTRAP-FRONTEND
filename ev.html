@@ -8,53 +8,185 @@
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <!-- Dein globales Styling -->
+  <!-- Global / shared styling -->
   <link href="styles.css" rel="stylesheet">
 
   <style>
-    /* leichte visuelle Politur */
-    .section-header {
-      text-align: center;
+    body {
+      background: linear-gradient(135deg, #e8f0ff 0%, #f7f9ff 60%);
+      min-height: 100vh;
     }
+
+    h1 {
+      color: #0d47a1;
+      text-shadow: 0 2px 6px rgba(13, 110, 253, 0.25);
+    }
+
     .section-header .headline {
       font-weight: 600;
+      letter-spacing: -0.03em;
+      color: #0d47a1;
     }
+
     .section-header .subline {
-      color: #6c757d;
+      color: #5b6b88;
       font-size: .95rem;
       max-width: 480px;
       margin-left: auto;
       margin-right: auto;
     }
 
+    /* Panel oben mit Buttons / Suche */
     .controls-wrapper {
-      background: #fff;
-      border: 1px solid rgba(0,0,0,.08);
-      border-radius: .75rem;
-      box-shadow: 0 1rem 2rem rgba(0,0,0,.05);
-      padding: 1rem 1.25rem;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 1rem;
+      border: 1px solid rgba(13,110,253,.2);
+      box-shadow:
+        0 1rem 2rem rgba(13,110,253,.15),
+        0 0 20px rgba(13,110,253,.1);
+      backdrop-filter: blur(10px);
+      padding: 1.5rem 1.5rem 1rem;
+
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
+    .pill-btn-main {
+      border-radius: 9999px;
+      padding: .8rem 1.3rem;
+      font-weight: 600;
+      font-size: .95rem;
+      background: linear-gradient(135deg, #0d6efd, #5fa8ff);
+      border: none;
+      color: #fff;
+      box-shadow: 0 .8rem 1.4rem rgba(13,110,253,.35);
+      transition: all .25s ease;
+      width: 100%;
+    }
+
+    .pill-btn-main:hover {
+      background: linear-gradient(135deg, #5fa8ff, #0d6efd);
+      transform: scale(1.05);
+      box-shadow: 0 1.2rem 2rem rgba(13,110,253,.45);
+      color: #fff;
+    }
+
+    .search-label {
+      font-size: .8rem;
+      font-weight: 600;
+      color: #6c7a96;
+      margin-bottom: .25rem;
+    }
+
+    .search-hint {
+      font-size: .8rem;
+      color: #6c7a96;
+    }
+
+    .input-group .form-control {
+      border-radius: .6rem 0 0 .6rem;
+      border: 1px solid rgba(13,110,253,.4);
+      box-shadow: 0 .5rem 1rem rgba(13,110,253,.15);
+    }
+
+    .input-group .form-control:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 .2rem rgba(13,110,253,.2);
+    }
+
+    .input-group .btn-search {
+      border-radius: 0 .6rem .6rem 0;
+      font-weight: 600;
+      background: rgba(13,110,253,.08);
+      color: #0d6efd;
+      border: 1px solid rgba(13,110,253,.4);
+      box-shadow: 0 .5rem 1rem rgba(13,110,253,.15);
+      transition: all .2s ease;
+    }
+
+    .input-group .btn-search:hover {
+      background: rgba(13,110,253,.12);
+      color: #0b5ed7;
+      box-shadow: 0 .8rem 1.4rem rgba(13,110,253,.22);
+    }
+
+    /* Ergebnis-Panel */
+    .results-card {
+      border-radius: 1rem;
+      border: none;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 1rem 2rem rgba(13, 110, 253, 0.15),
+        0 0 20px rgba(13, 110, 253, 0.1);
+      backdrop-filter: blur(10px);
+
+      overflow: hidden;
+      max-width: 900px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .results-header-title {
+      font-weight: 600;
+      color: #0d47a1;
+      text-shadow: 0 1px 4px rgba(13,110,253,.18);
+    }
+
+    .status-line {
+      font-size: .8rem;
+      color: #6c757d;
+      min-height: 1.2em;
+      font-weight: 500;
+    }
+
+    .status-line.ready {
+      color: #198754;
+      text-shadow: 0 0 8px rgba(25, 135, 84, .4);
+    }
+
+    ol#evList {
+      list-style: none;
+      padding-left: 0;
+      margin-bottom: 0;
+    }
+
+    /* einzelne Stationen */
     .station-card {
-      background: #fff;
-      border: 1px solid rgba(0,0,0,.07);
-      border-radius: .75rem;
-      padding: .75rem 1rem;
-      box-shadow: 0 .5rem 1rem rgba(0,0,0,.04);
+      background: rgba(245, 248, 255, 0.8);
+      border: 1px solid rgba(13,110,253,.25);
+      border-radius: .9rem;
+      padding: 1rem 1rem 1rem;
+      box-shadow:
+        0 .75rem 1.5rem rgba(13,110,253,.12),
+        inset 0 0 10px rgba(13,110,253,.15);
     }
 
     .station-rank {
-      width: 2rem;
-      height: 2rem;
+      width: 2.3rem;
+      height: 2.3rem;
       font-size: .9rem;
       font-weight: 600;
-      background: #0d6efd;
+      background: linear-gradient(135deg,#0d6efd,#5fa8ff);
       color: #fff;
-      border-radius: .5rem;
+      border-radius: .6rem;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
+      box-shadow: 0 .8rem 1.4rem rgba(13,110,253,.35);
+    }
+
+    .station-name {
+      font-weight: 600;
+      font-size: 1rem;
+      color: #0d47a1;
+      text-shadow: 0 1px 3px rgba(13,110,253,.2);
+    }
+
+    .station-address {
+      color: #6c7a96;
+      font-size: .85rem;
     }
 
     .distance-badge {
@@ -65,12 +197,7 @@
       border-radius: .4rem;
       padding: .25rem .5rem;
       display: inline-block;
-    }
-
-    .status-line {
-      font-size: .8rem;
-      color: #6c757d;
-      min-height: 1.2em;
+      box-shadow: 0 .5rem 1rem rgba(13,110,253,.2);
     }
 
     .error-text {
@@ -78,23 +205,13 @@
       font-weight: 500;
     }
 
-    ol#evList {
-      list-style: none;
-      padding-left: 0;
-      margin-bottom: 0;
-    }
-
-    .divider-line {
-      border-top: 1px solid rgba(0,0,0,.08);
-      margin: 1rem 0 0 0;
-    }
-
-    @media (min-width: 576px) {
-      .inputs-flex {
+    @media (min-width: 768px) {
+      .controls-grid {
         display: flex;
+        flex-direction: row;
         align-items: flex-start;
-        gap: 1rem;
         justify-content: center;
+        gap: 2rem;
       }
     }
   </style>
@@ -103,69 +220,64 @@
 <body data-page="ev" class="bg-light">
   <div id="site-nav"></div>
 
-  <main class="container my-4">
+  <main class="container py-5">
 
     <!-- Titel / Intro -->
-    <header class="section-header mb-4">
-      <h1 class="headline display-6 mb-2">Strom-Tankstellen in der Nähe</h1>
+    <header class="section-header text-center mb-4">
+      <h1 class="headline display-6 mb-2">🔌 Strom-Tankstellen in der Nähe</h1>
       <p class="subline">
-        Finde die nächstgelegenen öffentlichen Ladestationen für Elektroautos. Entweder um Winterthur herum
-        oder rund um eine beliebige Schweizer PLZ.
+        Finde die nächstgelegenen öffentlichen Ladestationen für Elektroautos.
+        Entweder in der Umgebung Winterthur – oder rund um eine beliebige Schweizer PLZ.
       </p>
     </header>
 
-    <!-- Steuerung -->
+    <!-- Steuerung / Suche -->
     <section class="controls-wrapper mb-4">
-      <div class="row gy-3 align-items-center justify-content-center">
+      <div class="controls-grid">
+
         <!-- Button Winterthur -->
-        <div class="col-12 col-lg-auto text-center">
-          <button id="btnEv" class="btn btn-primary pill-btn w-100">
-            🔌 Top&nbsp;5 um Winterthur
+        <div class="text-center flex-grow-0">
+          <button id="btnEv" class="pill-btn-main mb-2">
+            🌍 Top&nbsp;5 um Winterthur laden
           </button>
-          <div class="form-text">
-            Nutzt Winterthur (47.4988 / 8.7237) als Zentrum
+          <div class="search-hint">
+            Referenzpunkt: 47.4988 / 8.7237
           </div>
         </div>
 
         <!-- PLZ Suche -->
-        <div class="col-12 col-lg-auto">
-          <div class="inputs-flex">
-            <div class="flex-grow-1" style="min-width:220px;">
-              <label for="plzInput" class="form-label mb-1 fw-semibold small text-muted">
-                PLZ wählen
-              </label>
-              <div class="input-group">
-                <input id="plzInput" type="text" class="form-control" placeholder="z.B. 8400">
-                <button id="btnPlz" class="btn btn-outline-primary">
-                  🔍 Suchen
-                </button>
-              </div>
-              <div class="form-text">
-                Zeigt die Top&nbsp;5 Ladestationen nahe dieser PLZ
-              </div>
-            </div>
+        <div class="flex-grow-1" style="min-width:240px;max-width:320px;">
+          <label for="plzInput" class="search-label">PLZ wählen</label>
+          <div class="input-group mb-1">
+            <input id="plzInput" type="text" class="form-control" placeholder="z.B. 8400">
+            <button id="btnPlz" class="btn btn-search">
+              🔍 Suchen
+            </button>
+          </div>
+          <div class="search-hint">
+            Zeigt die Top&nbsp;5 Ladestationen nahe dieser PLZ
           </div>
         </div>
+
       </div>
     </section>
 
-    <!-- Result -->
-    <section class="card shadow-sm">
+    <!-- Ergebnisse -->
+    <section class="results-card shadow-lg">
       <div class="card-body">
-        <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-start mb-3">
-          <div>
-            <div class="fw-semibold">Ergebnisse</div>
-            <div id="statusLine" class="status-line">Noch nichts geladen…</div>
-          </div>
+        <!-- Header/Status -->
+        <div class="mb-2">
+          <div class="results-header-title">Ergebnisse</div>
+          <div id="statusLine" class="status-line">Noch nichts geladen…</div>
         </div>
 
-        <div id="evResult">
-          <ol id="evList" class="mb-0">
-            <!-- Dynamische Liste -->
-          </ol>
-        </div>
+        <!-- Liste -->
+        <ol id="evList" class="mb-0 p-0">
+          <!-- Dynamische Liste kommt hier rein -->
+        </ol>
       </div>
     </section>
+
   </main>
 
   <!-- JS libs -->
@@ -294,7 +406,9 @@
     function renderTop5($list, stationsWithDistance, titleExtra) {
       if (!stationsWithDistance.length) {
         $list.html('<li class="error-text">Keine Resultate 😕</li>');
-        $('#statusLine').text('Keine Resultate gefunden.');
+        $('#statusLine')
+          .removeClass('ready')
+          .text('Keine Resultate gefunden.');
         return;
       }
 
@@ -309,8 +423,8 @@
             <div class="d-flex flex-row flex-nowrap align-items-start gap-3">
               <div class="station-rank flex-shrink-0">${i + 1}</div>
               <div class="flex-grow-1">
-                <div class="fw-semibold">${st.name}</div>
-                <div class="text-muted small">${st.address}</div>
+                <div class="station-name">${st.name}</div>
+                <div class="station-address">${st.address}</div>
                 <div class="mt-2">
                   <span class="distance-badge">
                     ~ ${st.distance.toFixed(2)} km entfernt
@@ -325,19 +439,25 @@
       $list.html(html);
 
       // Status aktualisieren
-      $('#statusLine').text(titleExtra || 'Ergebnisse geladen.');
+      $('#statusLine')
+        .addClass('ready')
+        .text(titleExtra || 'Ergebnisse geladen ✔');
     }
 
     // Button: Top 5 um Winterthur
     $('#btnEv').on('click', function () {
       const $list = $('#evList');
-      $('#statusLine').text('Suche Ladestationen rund um Winterthur …');
+      $('#statusLine')
+        .removeClass('ready')
+        .text('Suche Ladestationen rund um Winterthur …');
       $list.html('<li class="text-muted">Lade…</li>');
 
       fetchStations(function(err, stations) {
         if (err) {
           $list.html('<li class="error-text">' + err.message + '</li>');
-          $('#statusLine').text('Fehler beim Laden 😢');
+          $('#statusLine')
+            .removeClass('ready')
+            .text('Fehler beim Laden 😢');
           return;
         }
 
@@ -357,17 +477,23 @@
 
       if (!plzRaw) {
         $list.html('<li class="error-text">Bitte zuerst eine PLZ eingeben 🙃</li>');
-        $('#statusLine').text('Fehlende PLZ.');
+        $('#statusLine')
+          .removeClass('ready')
+          .text('Fehlende PLZ.');
         return;
       }
 
-      $('#statusLine').text('Suche Ladestationen für PLZ ' + plzRaw + ' …');
+      $('#statusLine')
+        .removeClass('ready')
+        .text('Suche Ladestationen für PLZ ' + plzRaw + ' …');
       $list.html('<li class="text-muted">Lade…</li>');
 
       fetchStations(function(err, stations) {
         if (err) {
           $list.html('<li class="error-text">' + err.message + '</li>');
-          $('#statusLine').text('Fehler beim Laden 😢');
+          $('#statusLine')
+            .removeClass('ready')
+            .text('Fehler beim Laden 😢');
           return;
         }
 
@@ -376,11 +502,13 @@
 
         if (!sameZip.length) {
           $list.html('<li class="error-text">Keine Station direkt in dieser PLZ gefunden 🤔</li>');
-          $('#statusLine').text('Keine Station in PLZ ' + plzRaw + ' gefunden.');
+          $('#statusLine')
+            .removeClass('ready')
+            .text('Keine Station in PLZ ' + plzRaw + ' gefunden.');
           return;
         }
 
-        // Wir nehmen die erste Station der PLZ als Referenzpunkt
+        // Erste Station als Referenzpunkt nehmen
         const refLat = sameZip[0].lat;
         const refLon = sameZip[0].lon;
 
@@ -397,7 +525,6 @@
         );
       });
     });
-
   </script>
 </body>
 </html>

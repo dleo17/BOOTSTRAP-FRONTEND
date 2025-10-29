@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mein Lieblings-Ort – Info Website 2025</title>
+  <title>📍 Lieblings-Ort – Info Website 2025</title>
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="styles.css" rel="stylesheet">
 
-  <!-- Leaflet CSS (für Karte) -->
+  <!-- Leaflet CSS -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -18,145 +18,220 @@
   />
 
   <style>
-    /* Karte soll eine fixe Höhe haben */
-    #mapBox {
-      width: 100%;
-      height: 400px;
-      border-radius: .5rem;
-      background: #eef2f6;
-      border: 1px solid rgba(0,0,0,.1);
+    body {
+      background: linear-gradient(135deg, #e8f0ff 0%, #f7f9ff 60%);
+      min-height: 100vh;
+    }
+
+    h1 {
+      color: #0d47a1;
+      text-shadow: 0 2px 6px rgba(13,110,253,0.25);
+    }
+
+    .map-card {
+      border-radius: 1rem;
+      background: rgba(255, 255, 255, 0.9);
+      box-shadow:
+        0 1rem 2rem rgba(13, 110, 253, 0.15),
+        0 0 20px rgba(13, 110, 253, 0.1);
+      backdrop-filter: blur(10px);
       overflow: hidden;
     }
 
-    /* kleiner Effekt beim Refresh */
+    #mapBox {
+      width: 100%;
+      height: 450px;
+      border-radius: 1rem;
+      background: #eef2f6;
+      border: 1px solid rgba(13,110,253,0.25);
+      box-shadow: inset 0 0 10px rgba(13,110,253,0.1);
+      overflow: hidden;
+    }
+
     .ring {
       animation: pulse 0.4s ease;
     }
+
     @keyframes pulse {
       0% { box-shadow: 0 0 0 0 rgba(13,110,253,0.4); }
       100% { box-shadow: 0 0 0 15px rgba(13,110,253,0); }
     }
+
+    .pill-btn-main {
+      border-radius: 9999px;
+      padding: 0.8rem 1.6rem;
+      font-weight: 600;
+      font-size: 1rem;
+      background: linear-gradient(135deg, #0d6efd, #5fa8ff);
+      border: none;
+      color: #fff;
+      box-shadow: 0 .8rem 1.4rem rgba(13,110,253,.35);
+      transition: all .25s ease;
+    }
+
+    .pill-btn-main:hover {
+      transform: scale(1.05);
+      background: linear-gradient(135deg, #5fa8ff, #0d6efd);
+      box-shadow: 0 1.2rem 2rem rgba(13,110,253,.45);
+    }
+
+    .input-group {
+      max-width: 480px;
+      margin: 0 auto;
+    }
+
+    .input-group .form-control {
+      border-radius: 50px 0 0 50px;
+      border: 1px solid rgba(13,110,253,.4);
+      box-shadow: 0 .5rem 1rem rgba(13,110,253,.15);
+    }
+
+    .input-group .form-control:focus {
+      border-color: #0d6efd;
+      box-shadow: 0 0 0 .2rem rgba(13,110,253,.25);
+    }
+
+    .input-group .btn {
+      border-radius: 0 50px 50px 0;
+      background: rgba(13,110,253,.1);
+      border: 1px solid rgba(13,110,253,.4);
+      color: #0d6efd;
+      font-weight: 600;
+      transition: all .25s ease;
+    }
+
+    .input-group .btn:hover {
+      background: rgba(13,110,253,.2);
+      box-shadow: 0 .5rem 1rem rgba(13,110,253,.2);
+    }
+
+    #searchHint {
+      font-size: .85rem;
+      color: #6c7a96;
+    }
   </style>
 </head>
+
 <body data-page="map" class="bg-light">
   <div id="site-nav"></div>
 
-  <main class="container my-4">
-    <h1 class="display-6 fw-bold mb-4 text-center">Mein Lieblings-Ort</h1>
+  <main class="container py-5">
+    <h1 class="display-6 fw-bold mb-4 text-center">📍 Mein Lieblings-Ort</h1>
 
-    <div class="text-center mb-3">
-      <button id="btnMap" class="btn btn-primary pill-btn me-2">Karte anzeigen</button>
+    <!-- Steuerung -->
+    <div class="text-center mb-4">
+      <button id="btnMap" class="pill-btn-main me-2">Karte anzeigen</button>
     </div>
 
-    <!-- 🔍 Eingabefeld für Orts-Suche -->
-    <div class="input-group mb-4">
-      <input type="text" id="placeInput" class="form-control" placeholder="Ort eingeben, z. B. Zürich HB" />
-      <button id="btnSearch" class="btn btn-outline-primary">Ort suchen</button>
+    <!-- Eingabefeld -->
+    <div class="input-group mb-2">
+      <input type="text" id="placeInput" class="form-control" placeholder="Ort eingeben, z. B. Zürich HB oder Bern" />
+      <button id="btnSearch" class="btn">
+        🔍 Suchen
+      </button>
     </div>
+    <p id="searchHint" class="text-center mb-4">Gib einen Ort ein und zentriere die Karte automatisch.</p>
 
-    <div class="card shadow-sm">
-      <div class="card-body">
+    <!-- Karte -->
+    <div class="map-card shadow-lg">
+      <div class="card-body p-3">
         <div id="mapBox" class="d-flex align-items-center justify-content-center text-muted">
-          Karte folgt…
+          Karte folgt …
         </div>
       </div>
     </div>
   </main>
 
-  <!-- jQuery, Bootstrap JS -->
+  <!-- jQuery / Bootstrap -->
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Leaflet JS -->
+  <!-- Leaflet -->
   <script
     src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""
   ></script>
 
-  <!-- Deine gemeinsame Logik (Nav usw.) -->
   <script src="app.js"></script>
 
   <script>
-  // Fester Lieblingsort (BBW – Pionierstrasse 28, Winterthur)
-  const FAV_LAT = 47.498311992166585;
-  const FAV_LON = 8.719900186507994;
-  const FAV_LABEL = "Mein Lieblings-Ort: BBW Pionierstrasse 28, Winterthur 🏫";
+    // 🎯 Lieblingsort (BBW Pionierstrasse 28, Winterthur)
+    const FAV_LAT = 47.498311992166585;
+    const FAV_LON = 8.719900186507994;
+    const FAV_LABEL = "Mein Lieblings-Ort: BBW Pionierstrasse 28, Winterthur 🏫";
 
-  let mapInstance = null;
-  let userMarker = null;
+    let mapInstance = null;
+    let userMarker = null;
 
-  // Funktion: Karte initialisieren
-  function initMap() {
-    const $mapBox = $('#mapBox');
-    if (mapInstance) {
-      $mapBox.addClass('ring').delay(300).queue(next => {
-        $mapBox.removeClass('ring');
-        next();
-      });
-      return;
-    }
-
-    $mapBox
-      .removeClass('d-flex align-items-center justify-content-center text-muted')
-      .text('')
-      .append('<div id="leafletMap" style="width:100%;height:100%;"></div>');
-
-    mapInstance = L.map('leafletMap').setView([FAV_LAT, FAV_LON], 16);
-
-    const swissTopoLayer = L.tileLayer(
-      'https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg',
-      {
-        attribution: '© swisstopo | api3.geo.admin.ch',
-        maxZoom: 19,
-        minZoom: 0
-      }
-    ).addTo(mapInstance);
-
-    const marker = L.marker([FAV_LAT, FAV_LON]).addTo(mapInstance);
-    marker.bindPopup(`<strong>${FAV_LABEL}</strong><br>${FAV_LAT.toFixed(5)}, ${FAV_LON.toFixed(5)}`).openPopup();
-  }
-
-  // Button "Karte anzeigen"
-  $('#btnMap').on('click', initMap);
-
-  // Button "Ort suchen"
-  $('#btnSearch').on('click', async function() {
-    const query = $('#placeInput').val().trim();
-    if (!query) {
-      alert('Bitte gib einen Ort ein.');
-      return;
-    }
-
-    // Falls Karte noch nicht initialisiert wurde → initialisieren
-    if (!mapInstance) initMap();
-
-    try {
-      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=1`;
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (data.length === 0) {
-        alert('Ort nicht gefunden 😕');
+    // 🗺️ Karte initialisieren
+    function initMap() {
+      const $mapBox = $('#mapBox');
+      if (mapInstance) {
+        $mapBox.addClass('ring').delay(300).queue(next => {
+          $mapBox.removeClass('ring');
+          next();
+        });
         return;
       }
 
-      const { lat, lon, display_name } = data[0];
-      const coords = [parseFloat(lat), parseFloat(lon)];
-      mapInstance.setView(coords, 15);
+      $mapBox
+        .removeClass('d-flex align-items-center justify-content-center text-muted')
+        .text('')
+        .append('<div id="leafletMap" style="width:100%;height:100%;border-radius:1rem;"></div>');
 
-      // Falls schon ein Marker existiert → entfernen
-      if (userMarker) {
-        mapInstance.removeLayer(userMarker);
+      mapInstance = L.map('leafletMap').setView([FAV_LAT, FAV_LON], 16);
+
+      const swissTopoLayer = L.tileLayer(
+        'https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg',
+        {
+          attribution: '© swisstopo | api3.geo.admin.ch',
+          maxZoom: 19
+        }
+      ).addTo(mapInstance);
+
+      const marker = L.marker([FAV_LAT, FAV_LON]).addTo(mapInstance);
+      marker.bindPopup(`<strong>${FAV_LABEL}</strong><br>${FAV_LAT.toFixed(5)}, ${FAV_LON.toFixed(5)}`).openPopup();
+    }
+
+    // 📍 Button „Karte anzeigen“
+    $('#btnMap').on('click', initMap);
+
+    // 🔍 Button „Ort suchen“
+    $('#btnSearch').on('click', async function() {
+      const query = $('#placeInput').val().trim();
+      if (!query) {
+        alert('Bitte gib einen Ort ein.');
+        return;
       }
 
-      userMarker = L.marker(coords).addTo(mapInstance);
-      userMarker.bindPopup(`<strong>${display_name}</strong>`).openPopup();
-    } catch (err) {
-      console.error('Fehler bei Ortssuche:', err);
-      alert('Fehler beim Laden des Ortes 😬');
-    }
-  });
+      if (!mapInstance) initMap();
+
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=1`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (data.length === 0) {
+          alert('Ort nicht gefunden 😕');
+          return;
+        }
+
+        const { lat, lon, display_name } = data[0];
+        const coords = [parseFloat(lat), parseFloat(lon)];
+        mapInstance.setView(coords, 15);
+
+        if (userMarker) {
+          mapInstance.removeLayer(userMarker);
+        }
+
+        userMarker = L.marker(coords).addTo(mapInstance);
+        userMarker.bindPopup(`<strong>${display_name}</strong>`).openPopup();
+      } catch (err) {
+        console.error('Fehler bei Ortssuche:', err);
+        alert('Fehler beim Laden des Ortes 😬');
+      }
+    });
   </script>
 </body>
 </html>
