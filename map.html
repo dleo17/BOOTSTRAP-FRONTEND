@@ -27,6 +27,15 @@
       border: 1px solid rgba(0,0,0,.1);
       overflow: hidden;
     }
+
+    /* kleiner Effekt beim Refresh */
+    .ring {
+      animation: pulse 0.4s ease;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(13,110,253,0.4); }
+      100% { box-shadow: 0 0 0 15px rgba(13,110,253,0); }
+    }
   </style>
 </head>
 <body data-page="map" class="bg-light">
@@ -36,7 +45,13 @@
     <h1 class="display-6 fw-bold mb-4 text-center">Mein Lieblings-Ort</h1>
 
     <div class="text-center mb-3">
-      <button id="btnMap" class="btn btn-primary pill-btn">Karte anzeigen</button>
+      <button id="btnMap" class="btn btn-primary pill-btn me-2">Karte anzeigen</button>
+    </div>
+
+    <!-- 🔍 Eingabefeld für Orts-Suche -->
+    <div class="input-group mb-4">
+      <input type="text" id="placeInput" class="form-control" placeholder="Ort eingeben, z. B. Zürich HB" />
+      <button id="btnSearch" class="btn btn-outline-primary">Ort suchen</button>
     </div>
 
     <div class="card shadow-sm">
@@ -64,55 +79,84 @@
 
   <script>
   // Fester Lieblingsort (BBW – Pionierstrasse 28, Winterthur)
-  const FAV_LAT = 47.498311992166585;   // exakte Koordinaten BBW Winterthur
+  const FAV_LAT = 47.498311992166585;
   const FAV_LON = 8.719900186507994;
   const FAV_LABEL = "Mein Lieblings-Ort: BBW Pionierstrasse 28, Winterthur 🏫";
 
-    let mapInstance = null; // wir merken uns die Karte, damit wir sie nicht doppelt initialisieren
+  let mapInstance = null;
+  let userMarker = null;
 
-    $('#btnMap').on('click', function () {
-      const $mapBox = $('#mapBox');
+  // Funktion: Karte initialisieren
+  function initMap() {
+    const $mapBox = $('#mapBox');
+    if (mapInstance) {
+      $mapBox.addClass('ring').delay(300).queue(next => {
+        $mapBox.removeClass('ring');
+        next();
+      });
+      return;
+    }
 
-      // Falls Karte schon existiert -> nichts neu bauen
-      if (mapInstance) {
-        // kleine Animation als Feedback
-        $mapBox.addClass('ring').delay(300).queue(function(next){
-          $mapBox.removeClass('ring');
-          next();
-        });
+    $mapBox
+      .removeClass('d-flex align-items-center justify-content-center text-muted')
+      .text('')
+      .append('<div id="leafletMap" style="width:100%;height:100%;"></div>');
+
+    mapInstance = L.map('leafletMap').setView([FAV_LAT, FAV_LON], 16);
+
+    const swissTopoLayer = L.tileLayer(
+      'https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg',
+      {
+        attribution: '© swisstopo | api3.geo.admin.ch',
+        maxZoom: 19,
+        minZoom: 0
+      }
+    ).addTo(mapInstance);
+
+    const marker = L.marker([FAV_LAT, FAV_LON]).addTo(mapInstance);
+    marker.bindPopup(`<strong>${FAV_LABEL}</strong><br>${FAV_LAT.toFixed(5)}, ${FAV_LON.toFixed(5)}`).openPopup();
+  }
+
+  // Button "Karte anzeigen"
+  $('#btnMap').on('click', initMap);
+
+  // Button "Ort suchen"
+  $('#btnSearch').on('click', async function() {
+    const query = $('#placeInput').val().trim();
+    if (!query) {
+      alert('Bitte gib einen Ort ein.');
+      return;
+    }
+
+    // Falls Karte noch nicht initialisiert wurde → initialisieren
+    if (!mapInstance) initMap();
+
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&addressdetails=1&limit=1`;
+      const response = await fetch(url);
+      const data = await response.json();
+
+      if (data.length === 0) {
+        alert('Ort nicht gefunden 😕');
         return;
       }
 
-      // Platzhalter-Text raus, echtes DIV für Leaflet rein
-      $mapBox
-        .removeClass('d-flex align-items-center justify-content-center text-muted')
-        .text('') // leeren
-        .append('<div id="leafletMap" style="width:100%;height:100%;"></div>');
+      const { lat, lon, display_name } = data[0];
+      const coords = [parseFloat(lat), parseFloat(lon)];
+      mapInstance.setView(coords, 15);
 
-      // Leaflet Map initialisieren
-      mapInstance = L.map('leafletMap').setView([FAV_LAT, FAV_LON], 16);
+      // Falls schon ein Marker existiert → entfernen
+      if (userMarker) {
+        mapInstance.removeLayer(userMarker);
+      }
 
-      // Hintergrund-Kartenlayer vom Bund (api3.geo.admin.ch)
-      // Wir nehmen hier swisstopo webmercator tiles. Das ist öffentlich nutzbar,
-      // Doku: https://api3.geo.admin.ch/index.html  (WMTS / tiles)
-      //
-      // WICHTIG: Diese Tile-URL ist der Standard XYZ Endpunkt der Bundeskarte in Web-Mercator.
-      // Wir nutzen hier ch.swisstopo.pixelkarte-farbe als Layer (bunt / Strassenkarte).
-      //
-      const swissTopoLayer = L.tileLayer(
-        'https://wmts10.geo.admin.ch/1.0.0/ch.swisstopo.pixelkarte-farbe/default/current/3857/{z}/{x}/{y}.jpeg',
-        {
-          attribution: '© swisstopo, Bundesamt für Landestopografie | api3.geo.admin.ch',
-          maxZoom: 19,
-          minZoom: 0
-        }
-      );
-      swissTopoLayer.addTo(mapInstance);
-
-      // Marker setzen
-      const marker = L.marker([FAV_LAT, FAV_LON]).addTo(mapInstance);
-      marker.bindPopup(`<strong>${FAV_LABEL}</strong><br>${FAV_LAT.toFixed(5)}, ${FAV_LON.toFixed(5)}`).openPopup();
-    });
+      userMarker = L.marker(coords).addTo(mapInstance);
+      userMarker.bindPopup(`<strong>${display_name}</strong>`).openPopup();
+    } catch (err) {
+      console.error('Fehler bei Ortssuche:', err);
+      alert('Fehler beim Laden des Ortes 😬');
+    }
+  });
   </script>
 </body>
 </html>
