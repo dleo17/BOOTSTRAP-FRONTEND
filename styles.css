@@ -1,10 +1,186 @@
-.hero {
-  min-height: 70vh;
-  background: linear-gradient(180deg, #bfe3ff 0%, #a9d6ff 100%);
-  border-radius: 1.25rem;
+/* =========================================================
+   🌐 Global Styles – Info Website 2025 (Bootstrap + Custom)
+   ========================================================= */
+
+/* --- Layout Basics --- */
+body {
+  background: linear-gradient(135deg, #eaf2ff 0%, #d6e4ff 50%, #f8faff 100%);
+  min-height: 100vh;
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+  color: #1b2a4e;
 }
-.pill-btn { border-radius: 9999px; padding: .6rem 1.1rem; font-weight: 600; }
+
+/* Smooth scroll and transitions */
+html {
+  scroll-behavior: smooth;
+}
+
+* {
+  transition: all 0.25s ease-in-out;
+}
+
+/* --- Navbar --- */
+.navbar {
+  box-shadow: 0 0 25px rgba(13, 110, 253, 0.15);
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.85) !important;
+}
+
+.navbar a.nav-link {
+  font-weight: 500;
+  color: #1b2a4e !important;
+  transition: all 0.2s;
+}
+
+.navbar a.nav-link:hover {
+  color: #0d6efd !important;
+  text-shadow: 0 0 6px rgba(13, 110, 253, 0.3);
+}
+
+/* --- Hero Section --- */
+.hero-card {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(14px);
+  border-radius: 1.4rem;
+  box-shadow: 0 2rem 3rem rgba(0, 80, 200, 0.08),
+              0 0 20px rgba(13, 110, 253, 0.05);
+  border: 1px solid rgba(13, 110, 253, 0.15);
+  padding: 3rem 3.5rem;
+  max-width: 1500px;
+  width: 95%;
+  margin: 0 auto;
+}
+
+.hero-card:hover {
+  box-shadow: 0 2rem 3rem rgba(0, 80, 200, 0.1),
+              0 0 25px rgba(13, 110, 253, 0.08);
+  transform: translateY(-3px);
+}
+
+.headline {
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #1b2a4e;
+}
+
+.intro-text {
+  color: #51607a;
+  max-width: 52rem;
+  margin: 0 auto 2rem;
+  font-size: 1.05rem;
+}
+
+/* --- Feature Cards Grid --- */
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
+  gap: 2rem;
+  justify-items: center;
+  margin-top: 2.5rem;
+}
+
+.feature-tile {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 1.2rem;
+  border: 1px solid rgba(13, 110, 253, 0.1);
+  box-shadow: 0 1.2rem 2rem rgba(0, 0, 0, 0.06),
+              inset 0 0 10px rgba(13, 110, 253, 0.04);
+  padding: 1.8rem 1.5rem 2rem;
+  height: 100%;
+  transition: all .25s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.feature-tile:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 1.5rem 2.5rem rgba(13, 110, 253, 0.18),
+              0 0 25px rgba(13, 110, 253, 0.15);
+  background: rgba(255, 255, 255, 0.97);
+}
+
+/* --- Feature Content --- */
+.feature-icon {
+  font-size: 1.8rem;
+  background: linear-gradient(135deg, rgba(13,110,253,0.1), rgba(0,80,255,0.2));
+  color: #0d6efd;
+  border-radius: .7rem;
+  width: 3.2rem;
+  height: 3.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1rem;
+  box-shadow: inset 0 0 10px rgba(13,110,253,0.25);
+}
+
+.feature-headline {
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: #0b5ed7;
+}
+
+.feature-desc {
+  font-size: .95rem;
+  color: #58657a;
+  margin-bottom: 1rem;
+  min-height: 3em;
+}
+
+/* --- Buttons --- */
+.feature-btn {
+  font-size: .95rem;
+  font-weight: 600;
+  border-radius: .7rem;
+  background: linear-gradient(135deg, #0d6efd, #4a9eff);
+  border: none;
+  box-shadow: 0 0.3rem 0.6rem rgba(13,110,253,0.3);
+  transition: all .25s ease;
+  color: #fff;
+}
+
+.feature-btn:hover {
+  background: linear-gradient(135deg, #4a9eff, #0d6efd);
+  transform: scale(1.04);
+  box-shadow: 0 0.8rem 1.4rem rgba(13,110,253,0.4);
+}
+
+.feature-btn:active {
+  transform: scale(0.98);
+}
+
+/* Pill Button (global small buttons) */
+.pill-btn {
+  border-radius: 9999px;
+  padding: .6rem 1.1rem;
+  font-weight: 600;
+}
+
+/* Placeholder Box (z. B. API result boxes) */
 .placeholder-box {
-  min-height: 160px; background:#f8f9fa; border:1px dashed #ced4da; border-radius:.75rem;
+  min-height: 160px;
+  background: #f8f9fa;
+  border: 1px dashed #ced4da;
+  border-radius: .75rem;
 }
-#mapBox { height: 360px; background:#eef2f6; border-radius:.75rem; }
+
+/* Maps & Boxes */
+#mapBox {
+  height: 360px;
+  background: #eef2f6;
+  border-radius: .75rem;
+}
+
+/* --- Futuristic Glow Animation (optional aesthetic) --- */
+@keyframes glowPulse {
+  0% { box-shadow: 0 0 10px rgba(13,110,253,0.2); }
+  50% { box-shadow: 0 0 25px rgba(13,110,253,0.4); }
+  100% { box-shadow: 0 0 10px rgba(13,110,253,0.2); }
+}
+
+.glow-effect {
+  animation: glowPulse 3s infinite ease-in-out;
+}
