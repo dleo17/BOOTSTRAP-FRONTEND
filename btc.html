@@ -29,14 +29,30 @@
   <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="app.js"></script>
-  <script>
-    // Dummy – später echte API (z. B. CoinGecko)
-    $('#btnBtc').on('click', function () {
-      $('#btcResult').html(`
-        <div class="fs-5">BTC/USD: <strong>–</strong></div>
-        <div class="fs-5">BTC/CHF: <strong>–</strong></div>
-      `);
-    });
-  </script>
+<script>
+  // 💰 Bitcoin-Preis via CoinGecko API
+  $('#btnBtc').on('click', function () {
+    const out = $('#btcResult').html('<span class="text-muted">Lade aktuellen BTC-Preis...</span>');
+
+    $.getJSON('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,chf')
+      .done(res => {
+        if (res && res.bitcoin) {
+          const usd = res.bitcoin.usd.toLocaleString('de-CH', { style: 'currency', currency: 'USD' });
+          const chf = res.bitcoin.chf.toLocaleString('de-CH', { style: 'currency', currency: 'CHF' });
+
+          out.html(`
+            <div class="fs-5 mb-2"><strong>BTC/USD:</strong> ${usd}</div>
+            <div class="fs-5"><strong>BTC/CHF:</strong> ${chf}</div>
+            <div class="text-muted mt-2 small">Quelle: CoinGecko API</div>
+          `);
+        } else {
+          out.html('<div class="text-danger">Daten konnten nicht geladen werden 💰</div>');
+        }
+      })
+      .fail(() => {
+        out.html('<div class="text-danger">Fehler beim Abrufen des BTC-Preises 😿</div>');
+      });
+  });
+</script>
 </body>
 </html>
