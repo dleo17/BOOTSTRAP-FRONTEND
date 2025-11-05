@@ -184,3 +184,27 @@ html {
 .glow-effect {
   animation: glowPulse 3s infinite ease-in-out;
 }
+
+/* Vollbild-Canvas hinter allem Content */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none; /* klicks gehen durch */
+}
+
+/* Optional: Karten/Boxen leicht glasig */
+.glass {
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.12);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+}
+
+/* Vollbild-Canvas hinter dem Inhalt */
+#bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: -1;         /* hinter allem */
+  pointer-events: none;/* keine Klicks blockieren */
+}
