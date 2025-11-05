@@ -234,10 +234,74 @@
     }
     .station-card.expanded .map-wrapper{ height:260px; }
     .station-card .map-embed{ height:100%; width:100%; }
+
+    /* ==== EV Futuristic Background (overrides .bg-light) ==== */
+body.theme-ev{
+  /* force override against Bootstrap's .bg-light */
+  background:
+    radial-gradient(1200px 700px at 15% 20%, rgba(0,255,255,.10), transparent 60%),
+    radial-gradient(900px 600px  at 85% 80%, rgba(74,163,255,.10), transparent 70%),
+    #0b1220 !important;
+  color: #f5fbff;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+}
+body.theme-ev::before,
+body.theme-ev::after{
+  content:"";
+  position: fixed; inset: 0; pointer-events: none; z-index: -1;
+  background:
+    radial-gradient(500px 400px at 20% 25%, rgba(118,247,255,.14), transparent 60%),
+    radial-gradient(650px 500px at 80% 70%, rgba(74,163,255,.12), transparent 65%);
+  filter: blur(8px);
+  animation: evDrift 16s ease-in-out infinite alternate;
+}
+body.theme-ev::after{
+  mix-blend-mode: screen;
+  background:
+    radial-gradient(350px 280px at 70% 20%, rgba(118,247,255,.16), transparent 60%),
+    radial-gradient(380px 280px at 30% 80%, rgba(74,163,255,.14), transparent 60%);
+  animation-duration: 20s;
+}
+@keyframes evDrift{
+  from{ transform: translateY(-1.5%) translateX(-1%); }
+  to  { transform: translateY( 1.5%) translateX( 1%); }
+}
+
+/* Lesbarkeit auf dunkel */
+.section-header .headline,
+.section-header .subline,
+.results-header-title,
+.status-line,
+.station-name,
+.station-address {
+  color: #e6f4ff !important;
+  text-shadow: 0 0 14px rgba(0,0,0,.35);
+}
+.status-line.ready { color: #8fffb4 !important; text-shadow: 0 0 10px rgba(143,255,180,.45); }
+
+/* Glas-Effekt dunkler machen */
+.controls-wrapper,
+.results-card,
+.station-card{
+  background: rgba(12, 18, 30, 0.85) !important;
+  border-color: rgba(118,247,255,.20) !important;
+  box-shadow:
+    0 1.1rem 2.2rem rgba(0,0,0,.35),
+    0 0 30px rgba(118,247,255,.08);
+}
+
+.distance-badge{
+  background-color: rgba(118,247,255,.12) !important;
+  color: #76f7ff !important;
+  border: 1px solid rgba(118,247,255,.35);
+}
   </style>
+  
 </head>
 
-<body data-page="ev" class="bg-light">
+<body data-page="ev" class="theme-ev">
   <div id="site-nav"></div>
 
   <main class="container py-5">
