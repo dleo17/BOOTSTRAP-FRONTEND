@@ -133,11 +133,111 @@
       color: #6c757d;
       text-align: center;
     }
+    
+    /* === Apple-like thunder VIDEO background via Streamable === */
+    body.weather-thunder {
+      background: #0b0f16; /* fallback if iframe can't load */
+    }
+
+    .wx-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;             /* behind the content */
+      overflow: hidden;
+      pointer-events: none;   /* don't block clicks/scroll */
+    }
+
+    .wx-bg__iframe {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 120vw;           /* overscan so we always cover */
+      height: 120vh;
+      transform: translate(-50%, -50%);
+      border: 0;
+      filter: saturate(1.05) contrast(1.05) brightness(0.9);
+    }
+
+    .wx-bg__overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(1100px 520px at 50% 18%, rgba(15,25,40,.28), transparent 55%),
+        linear-gradient(180deg, rgba(8,12,20,.55), rgba(8,12,20,.8));
+      mix-blend-mode: normal;
+    }
+
+    /* keep the main content readable above */
+    #site-nav, main { position: relative; z-index: 1; }
+
+    /* Optional: slightly stronger card shadows on dark motion bg */
+    .weather-card, .forecast-card, .chart-card {
+      box-shadow:
+        0 1.2rem 2rem rgba(0,0,0,.35),
+        0 0 24px rgba(13,110,253,.06);
+    }
+    h1 { color:#d7e4ff; text-shadow: 0 3px 14px rgba(0,0,0,.35); }
+    p.text-muted { color:#c9d3e3 !important; }
+
+    /* Reduced motion: pause the video embed by hiding it, keep a soft gradient */
+    @media (prefers-reduced-motion: reduce) {
+      .wx-bg__iframe { display: none; }
+      .wx-bg__overlay {
+        background:
+          radial-gradient(1100px 520px at 50% 18%, rgba(15,25,40,.22), transparent 55%),
+          linear-gradient(180deg, rgba(8,12,20,.6), rgba(8,12,20,.92));
+      }
+    }
+
+      /* === Improve contrast for dark thunder background === */
+    .forecast-title,
+    .forecast-sub,
+    .chart-status,
+    .chart-status.ready,
+    .source-line {
+      color: #f2f5ff !important;
+      text-shadow: 0 0 8px rgba(0,0,0,0.6);
+    }
+
+    /* Make the small button filled for better visibility */
+    .pill-btn-small {
+      background: linear-gradient(135deg, #0d6efd, #5fa8ff);
+      color: #fff;
+      border: none;
+      box-shadow: 0 .6rem 1.2rem rgba(13,110,253,0.35);
+    }
+
+    .pill-btn-small:hover {
+      background: linear-gradient(135deg, #5fa8ff, #0d6efd);
+      transform: scale(1.05);
+      box-shadow: 0 1rem 2rem rgba(13,110,253,0.45);
+      color: #fff;
+    }
+
+    /* Make Highcharts axis labels and legend text readable on dark bg */
+    .highcharts-axis-labels text,
+    .highcharts-legend-item text,
+    .highcharts-title text,
+    .highcharts-subtitle text {
+      fill: #e9eef7 !important;
+    }
   </style>
 </head>
 
-<body data-page="weather" class="bg-light">
+<body data-page="weather" class="bg-light weather-thunder">
   <div id="site-nav"></div>
+
+  <!-- ⚡ Apple‑style thunder VIDEO background (Streamable embed) -->
+  <div class="wx-bg" aria-hidden="true">
+    <iframe
+      class="wx-bg__iframe"
+      src="https://streamable.com/e/t9yrw3?autoplay=1&loop=1&nocontrols=1&muted=1"
+      title="Thunder background"
+      allow="autoplay; fullscreen; picture-in-picture"
+      allowfullscreen
+    ></iframe>
+    <div class="wx-bg__overlay"></div>
+  </div>
 
   <main class="container py-5">
     <h1 class="display-6 fw-bold mb-3 text-center">🌦 Aktuelles Live Wetter</h1>
