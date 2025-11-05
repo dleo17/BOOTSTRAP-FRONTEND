@@ -75,6 +75,55 @@
       font-size: 0.9rem;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.9.3/lib/p5.min.js"></script>
+<script>
+  let bubbles = [];
+
+  function setup() {
+    const c = createCanvas(window.innerWidth, window.innerHeight);
+    c.id('bg-canvas');
+    noStroke();
+    for (let i = 0; i < 50; i++) {
+      bubbles.push({
+        x: random(width),
+        y: random(height),
+        r: random(30, 80),
+        dx: random(-0.4, 0.4),
+        dy: random(-0.4, 0.4),
+        col: color(random(180,230), random(200,240), random(255), 90)
+      });
+    }
+  }
+
+  function draw() {
+    // weicher Verlauf von weiss zu hellblau
+    for (let y = 0; y < height; y++) {
+      const inter = y / height;
+      const c = lerpColor(color(255,255,255), color(200,230,255), inter);
+      stroke(c);
+      line(0, y, width, y);
+    }
+
+    noStroke();
+    // schwebende Bubbles
+    for (let b of bubbles) {
+      fill(b.col);
+      ellipse(b.x, b.y, b.r);
+      b.x += b.dx;
+      b.y += b.dy;
+
+      // Rand-Kollisionen
+      if (b.x < -b.r) b.x = width + b.r;
+      if (b.x > width + b.r) b.x = -b.r;
+      if (b.y < -b.r) b.y = height + b.r;
+      if (b.y > height + b.r) b.y = -b.r;
+    }
+  }
+
+  function windowResized() {
+    resizeCanvas(window.innerWidth, window.innerHeight);
+  }
+</script>
 </head>
 
 <body data-page="cat">
