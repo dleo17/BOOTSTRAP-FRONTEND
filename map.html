@@ -109,10 +109,101 @@
       font-size: .85rem;
       color: #6c7a96;
     }
+
+/* 🌍 Neuer Hintergrund für MAP-Seite – digitale Kartenoptik */
+body.theme-map {
+  background:
+    radial-gradient(1200px 800px at 20% 20%, rgba(0, 255, 200, 0.06), transparent 80%),
+    radial-gradient(1000px 700px at 80% 80%, rgba(0, 140, 255, 0.05), transparent 80%),
+    url("https://www.transparenttextures.com/patterns/dark-mosaic.png"),
+    linear-gradient(160deg, #0a0f1f 0%, #07111d 100%);
+  color: #e6f4ff;
+  background-size: cover;
+  background-attachment: fixed;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Leichter animierter Lichtschein */
+body.theme-map::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(400px 300px at 25% 30%, rgba(0,255,200,0.12), transparent 70%),
+    radial-gradient(500px 350px at 75% 70%, rgba(0,140,255,0.1), transparent 70%);
+  filter: blur(12px);
+  animation: mapGlow 15s ease-in-out infinite alternate;
+  z-index: -1;
+}
+
+@keyframes mapGlow {
+  from { transform: scale(1); opacity: 0.8; }
+  to   { transform: scale(1.05); opacity: 1; }
+}
+
+/* Text bleibt hell */
+h1,
+label,
+#searchHint,
+.form-control,
+.btn,
+.text-muted {
+  color: #e6f4ff !important;
+}
+
+    /* Enhance map container glow */
+    .map-card {
+      background: rgba(12, 18, 30, 0.85) !important;
+      border: 1px solid rgba(0, 255, 200, 0.15);
+      box-shadow:
+        0 1.2rem 2.4rem rgba(0, 0, 0, 0.4),
+        0 0 25px rgba(0, 255, 200, 0.15);
+    }
+
+    /* Inputs and buttons match glowing look */
+    .form-control {
+      background: rgba(20, 28, 45, 0.8);
+      border: 1px solid rgba(0, 255, 200, 0.25);
+      color: #e6f4ff;
+      box-shadow: inset 0 0 6px rgba(0, 255, 200, 0.1);
+    }
+
+    /* Placeholder text fix for dark background */
+    .form-control::placeholder {
+      color: rgba(230, 244, 255, 0.75) !important;
+      opacity: 1;
+    }
+
+    /* Optional: make text more readable inside input */
+    .form-control {
+      color: #ffffff !important;
+      caret-color: #00ffc8;
+    }
+
+    .form-control:focus {
+      border-color: #00ffc8;
+      box-shadow: 0 0 8px rgba(0, 255, 200, 0.3);
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #00ffc8, #008cff);
+      border: none;
+      color: #081020;
+      font-weight: 600;
+      box-shadow: 0 0 20px rgba(0, 255, 200, 0.2);
+      transition: transform 0.2s ease, filter 0.2s ease;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      filter: brightness(1.2);
+    }
   </style>
 </head>
 
-<body data-page="map" class="bg-light">
+<body data-page="map" class="theme-map">
   <div id="site-nav"></div>
 
   <main class="container py-5">
