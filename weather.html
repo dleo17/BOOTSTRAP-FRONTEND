@@ -12,72 +12,95 @@
   <link href="styles.css" rel="stylesheet">
 
   <style>
+    /* ===== Global layout fallback ===== */
     body {
-      background: linear-gradient(135deg, #e8f0ff 0%, #f7f9ff 60%);
       min-height: 100vh;
+      margin: 0;
+      color: #eaf2ff;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
+    /* ===== Animated Weather Background (dark, stormy, moving glows) ===== */
+    body.weather-theme {
+      background:
+        radial-gradient(1200px 700px at 10% 0%, rgba(0, 176, 255, .16), transparent 60%),
+        radial-gradient(900px 600px at 90% 100%, rgba(0, 255, 200, .12), transparent 60%),
+        #050814;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body.weather-theme::before,
+    body.weather-theme::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(500px 400px at 20% 25%, rgba(0, 255, 200, .14), transparent 60%),
+        radial-gradient(650px 500px at 80% 70%, rgba(78, 148, 255, .16), transparent 65%);
+      filter: blur(8px);
+      animation: weatherDrift 20s ease-in-out infinite alternate;
+      mix-blend-mode: screen;
+    }
+
+    body.weather-theme::after {
+      background:
+        radial-gradient(360px 260px at 70% 20%, rgba(147, 197, 253, .25), transparent 60%),
+        radial-gradient(380px 280px at 25% 80%, rgba(45, 212, 191, .18), transparent 65%);
+      animation-duration: 26s;
+    }
+
+    @keyframes weatherDrift {
+      from {
+        transform: translate3d(-1.5%, -1.5%, 0);
+      }
+      to {
+        transform: translate3d(1.5%, 1.5%, 0);
+      }
+    }
+
+    /* keep content above background */
+    #site-nav,
+    main {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ===== Typography ===== */
     h1 {
-      color: #0d47a1;
-      text-shadow: 0 2px 6px rgba(13, 110, 253, 0.25);
+      color: #dbeafe;
+      text-shadow: 0 4px 18px rgba(0, 0, 0, .7);
     }
 
+    p.text-muted {
+      color: #cbd5f5 !important;
+    }
+
+    /* ===== Cards & panels ===== */
     .weather-card,
-    .chart-card {
+    .chart-card,
+    .forecast-card {
       border-radius: 1rem;
-      border: none;
-      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(148, 205, 255, 0.28);
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, .95), rgba(6, 11, 25, .98));
       box-shadow:
-        0 1rem 2rem rgba(13, 110, 253, 0.15),
-        0 0 20px rgba(13, 110, 253, 0.1);
-      backdrop-filter: blur(10px);
-    }
-
-    .pill-btn-main {
-      border-radius: 50px;
-      padding: 0.8rem 1.8rem;
-      font-weight: 600;
-      font-size: 1rem;
-      background: linear-gradient(135deg, #0d6efd, #5fa8ff);
-      border: none;
-      box-shadow: 0 .6rem 1.2rem rgba(13,110,253,0.35);
-      transition: all 0.25s ease;
-      color: #fff;
-    }
-
-    .pill-btn-main:hover {
-      background: linear-gradient(135deg, #5fa8ff, #0d6efd);
-      transform: scale(1.05);
-      box-shadow: 0 1.2rem 2rem rgba(13,110,253,0.45);
-      color: #fff;
-    }
-
-    .pill-btn-small {
-      border-radius: 9999px;
-      font-size: .8rem;
-      font-weight: 600;
-      background: rgba(13,110,253,.08);
-      color: #0d6efd;
-      border: 1px solid rgba(13,110,253,.4);
-      padding: .5rem .9rem;
-      box-shadow: 0 .5rem 1rem rgba(13,110,253,.15);
-    }
-
-    .pill-btn-small:hover {
-      background: rgba(13,110,253,.12);
-      color: #0b5ed7;
-      box-shadow: 0 .8rem 1.4rem rgba(13,110,253,.22);
+        0 1.4rem 2.8rem rgba(0, 0, 0, .75),
+        0 0 26px rgba(56, 189, 248, .25);
+      backdrop-filter: blur(16px);
     }
 
     #weatherResult {
-      background: rgba(245, 248, 255, 0.8);
+      background: rgba(15, 23, 42, 0.9);
       border-radius: .8rem;
       min-height: 120px;
-      border: 1px dashed rgba(13,110,253,.3);
-      box-shadow: inset 0 0 10px rgba(13, 110, 253, 0.15);
+      border: 1px solid rgba(148, 205, 255, .35);
+      box-shadow: inset 0 0 14px rgba(15, 23, 42, 0.9);
       padding: 1rem 1.25rem;
       font-size: 1rem;
       line-height: 1.5;
+      color: #e5edff;
     }
 
     /* Chart container */
@@ -85,15 +108,15 @@
       width: 100%;
       height: 320px;
       border-radius: .8rem;
-      background: rgba(245, 248, 255, 0.8);
-      border: 1px solid rgba(13,110,253,.15);
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 205, 255, .3);
       box-shadow:
-        inset 0 0 10px rgba(13, 110, 253, 0.15),
-        0 1rem 2rem rgba(13,110,253,.15);
+        inset 0 0 14px rgba(15, 23, 42, 0.9),
+        0 1rem 2rem rgba(15, 23, 42, .9);
       display: flex;
       align-items: center;
       justify-content: center;
-      color: #6c757d;
+      color: #9ca3c7;
       text-align: center;
       padding: 1rem;
     }
@@ -114,130 +137,101 @@
 
     .chart-meta {
       font-size: .8rem;
-      color: #6c757d;
+      color: #9ca3c7;
     }
 
     #chartStatus {
       font-size: .8rem;
       font-weight: 500;
-      color: #6c757d;
+      color: #9ca3c7;
     }
 
     #chartStatus.ready {
-      color: #198754;
-      text-shadow: 0 0 8px rgba(25, 135, 84, .4);
+      color: #86efac;
+      text-shadow: 0 0 10px rgba(22, 163, 74, .7);
     }
 
     .source-line {
       font-size: .75rem;
-      color: #6c757d;
+      color: #9ca3c7;
       text-align: center;
     }
-    
-    /* === Apple-like thunder VIDEO background via Streamable === */
-    body.weather-thunder {
-      background: #0b0f16; /* fallback if iframe can't load */
-    }
 
-    .wx-bg {
-      position: fixed;
-      inset: 0;
-      z-index: 0;             /* behind the content */
-      overflow: hidden;
-      pointer-events: none;   /* don't block clicks/scroll */
-    }
-
-    .wx-bg__iframe {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 120vw;           /* overscan so we always cover */
-      height: 120vh;
-      transform: translate(-50%, -50%);
-      border: 0;
-      filter: saturate(1.05) contrast(1.05) brightness(0.9);
-    }
-
-    .wx-bg__overlay {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(1100px 520px at 50% 18%, rgba(15,25,40,.28), transparent 55%),
-        linear-gradient(180deg, rgba(8,12,20,.55), rgba(8,12,20,.8));
-      mix-blend-mode: normal;
-    }
-
-    /* keep the main content readable above */
-    #site-nav, main { position: relative; z-index: 1; }
-
-    /* Optional: slightly stronger card shadows on dark motion bg */
-    .weather-card, .forecast-card, .chart-card {
+    /* ===== Buttons ===== */
+    .pill-btn-main {
+      border-radius: 999px;
+      padding: 0.8rem 1.8rem;
+      font-weight: 600;
+      font-size: 1rem;
+      background: linear-gradient(135deg, #0ea5e9, #22c55e);
+      border: none;
       box-shadow:
-        0 1.2rem 2rem rgba(0,0,0,.35),
-        0 0 24px rgba(13,110,253,.06);
-    }
-    h1 { color:#d7e4ff; text-shadow: 0 3px 14px rgba(0,0,0,.35); }
-    p.text-muted { color:#c9d3e3 !important; }
-
-    /* Reduced motion: pause the video embed by hiding it, keep a soft gradient */
-    @media (prefers-reduced-motion: reduce) {
-      .wx-bg__iframe { display: none; }
-      .wx-bg__overlay {
-        background:
-          radial-gradient(1100px 520px at 50% 18%, rgba(15,25,40,.22), transparent 55%),
-          linear-gradient(180deg, rgba(8,12,20,.6), rgba(8,12,20,.92));
-      }
+        0 1rem 2.2rem rgba(14, 165, 233, 0.6),
+        0 0 26px rgba(45, 212, 191, .65);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+      color: #f9fafb;
     }
 
-      /* === Improve contrast for dark thunder background === */
+    .pill-btn-main:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px) scale(1.03);
+      box-shadow:
+        0 1.4rem 2.8rem rgba(14, 165, 233, 0.7),
+        0 0 34px rgba(45, 212, 191, .75);
+      color: #f9fafb;
+    }
+
+    .pill-btn-main:active {
+      transform: translateY(0) scale(.98);
+      box-shadow: 0 .6rem 1.4rem rgba(0, 0, 0, .8);
+    }
+
+    .pill-btn-small {
+      border-radius: 9999px;
+      font-size: .8rem;
+      font-weight: 600;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      color: #f9fafb;
+      border: none;
+      padding: .55rem 1rem;
+      box-shadow: 0 .8rem 1.6rem rgba(79, 70, 229, 0.65);
+      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    }
+
+    .pill-btn-small:hover {
+      filter: brightness(1.08);
+      transform: translateY(-1px) scale(1.03);
+      box-shadow: 0 1rem 2rem rgba(79, 70, 229, 0.75);
+      color: #f9fafb;
+    }
+
+    .pill-btn-small:active {
+      transform: translateY(0) scale(.97);
+      box-shadow: 0 .5rem 1.2rem rgba(0, 0, 0, .85);
+    }
+
+    /* ===== Forecast header text on dark bg ===== */
     .forecast-title,
     .forecast-sub,
     .chart-status,
     .chart-status.ready,
     .source-line {
-      color: #f2f5ff !important;
-      text-shadow: 0 0 8px rgba(0,0,0,0.6);
+      color: #e5edff !important;
+      text-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
     }
 
-    /* Make the small button filled for better visibility */
-    .pill-btn-small {
-      background: linear-gradient(135deg, #0d6efd, #5fa8ff);
-      color: #fff;
-      border: none;
-      box-shadow: 0 .6rem 1.2rem rgba(13,110,253,0.35);
-    }
-
-    .pill-btn-small:hover {
-      background: linear-gradient(135deg, #5fa8ff, #0d6efd);
-      transform: scale(1.05);
-      box-shadow: 0 1rem 2rem rgba(13,110,253,0.45);
-      color: #fff;
-    }
-
-    /* Make Highcharts axis labels and legend text readable on dark bg */
+    /* ===== Highcharts text readable on dark background ===== */
     .highcharts-axis-labels text,
     .highcharts-legend-item text,
     .highcharts-title text,
     .highcharts-subtitle text {
-      fill: #e9eef7 !important;
+      fill: #e5edff !important;
     }
   </style>
 </head>
 
-<body data-page="weather" class="bg-light weather-thunder">
+<body data-page="weather" class="weather-theme">
   <div id="site-nav"></div>
-
-  <!-- ⚡ Apple‑style thunder VIDEO background (Streamable embed) -->
-  <div class="wx-bg" aria-hidden="true">
-    <iframe
-      class="wx-bg__iframe"
-      src="https://streamable.com/e/t9yrw3?autoplay=1&loop=1&nocontrols=1&muted=1"
-      title="Thunder background"
-      allow="autoplay; fullscreen; picture-in-picture"
-      allowfullscreen
-    ></iframe>
-    <div class="wx-bg__overlay"></div>
-  </div>
 
   <main class="container py-5">
     <h1 class="display-6 fw-bold mb-3 text-center">🌦 Aktuelles Live Wetter</h1>
