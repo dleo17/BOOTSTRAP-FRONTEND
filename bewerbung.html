@@ -135,28 +135,6 @@
 </head>
 
 <body data-page="bewerbung">
-    <!-- Navigation -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-  <div class="container">
-    <a class="navbar-brand fw-semibold" href="index.html">Info Website 2025</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="mainNav">
-      <ul class="navbar-nav ms-auto mb-2 mb-lg-0" id="navLinks">
-        <li class="nav-item"><a class="nav-link" href="index.html">Willkommen-Seite</a></li>
-        <li class="nav-item"><a class="nav-link" href="cat.html">Generiere deine Katze</a></li>
-        <li class="nav-item"><a class="nav-link" href="weather.html">Aktuelles Live Wetter</a></li>
-        <li class="nav-item"><a class="nav-link" href="btc.html">BTC in CHF & USD</a></li>
-        <li class="nav-item"><a class="nav-link" href="ev.html">Strom-Tankstellen</a></li>
-        <li class="nav-item"><a class="nav-link" href="map.html">Mein Lieblings-Ort</a></li>
-        <li class="nav-item"><a class="nav-link active" href="bewerbung.html">Bewerbung</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
-  <!-- deine dynamische Navigation -->
   <div id="site-nav"></div>
 
   <main class="container py-5">
@@ -426,6 +404,17 @@
         }, false);
       });
     })();
+  </script>
+  <script>
+    fetch('nav.html')
+      .then(res => {
+        if (!res.ok) throw new Error('Nav konnte nicht geladen werden');
+        return res.text();
+      })
+      .then(html => {
+        document.getElementById('site-nav').innerHTML = html;
+      })
+      .catch(err => console.error(err));
   </script>
 </body>
 </html>
