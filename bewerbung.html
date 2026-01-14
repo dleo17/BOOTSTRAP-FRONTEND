@@ -69,6 +69,15 @@
         color: rgba(214, 228, 255, .6);
     }
 
+    /* Autofill Fix (Chrome/Safari) */
+    input:-webkit-autofill,
+    textarea:-webkit-autofill,
+    select:-webkit-autofill {
+      -webkit-text-fill-color: #ffffff !important;
+      transition: background-color 9999s ease-in-out 0s;
+      box-shadow: 0 0 0px 1000px rgba(7, 12, 26, 0.9) inset !important;
+    }
+
 .form-control:focus,
 .form-select:focus {
   background: rgba(10, 18, 38, 0.98);
@@ -147,13 +156,7 @@
       </header>
 
       <div class="form-card p-4 p-md-5">
-        <form
-            class="needs-validation"
-            novalidate
-            method="POST"
-            action="https://webhook.site/f9f03492-d2b1-490f-9247-971e2fd04215"
-            enctype="multipart/form-data"
-        >
+        <form id="applyForm" class="needs-validation" novalidate>
           <!-- Personendaten -->
           <div class="mb-3">
             <div class="section-label">Personendaten</div>
@@ -390,20 +393,84 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Bootstrap-Style Validation
+    // Bootstrap-Style Validation (nur Styling; Submit-Handling macht der NocoDB-Handler unten)
     (() => {
       "use strict";
       const forms = document.querySelectorAll(".needs-validation");
       Array.from(forms).forEach(form => {
-        form.addEventListener("submit", event => {
-          if (!form.checkValidity()) {
-            event.preventDefault();
-            event.stopPropagation();
-          }
+        form.addEventListener("submit", () => {
           form.classList.add("was-validated");
         }, false);
       });
     })();
+  </script>
+  <script>
+    // ==== NocoDB: Bewerbung via API speichern (Localhost Demo) ====
+    // WICHTIG: Token nicht in ein öffentliches GitHub-Repo pushen.
+    const NOCODB_URL = "http://localhost:8080";
+    const TABLE_ID = "mos0tr7xuwtwgp6";
+    const NOCODB_TOKEN = "PASTE_XC_AUTH_TOKEN_HERE"; // <- hier dein xc-auth Token einfügen
+
+    const form = document.getElementById("applyForm");
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+
+      // HTML5 Validierung
+      if (!form.checkValidity()) {
+        form.classList.add("was-validated");
+        return;
+      }
+
+      // Werte sammeln
+      const cvFile = document.getElementById("cv").files?.[0] || null;
+
+      const payload = {
+        gender: document.getElementById("gender").value,
+        firstname: document.getElementById("firstname").value.trim(),
+        lastname: document.getElementById("lastname").value.trim(),
+        street: document.getElementById("street").value.trim(),
+        zipcity: document.getElementById("zipcity").value.trim(),
+        birthdate: document.getElementById("birthdate").value, // YYYY-MM-DD
+        email: document.getElementById("email").value.trim(),
+        phone: document.getElementById("phone").value.trim(),
+        contactPref: document.getElementById("contactPref").value,
+        motivation: document.getElementById("motivation").value.trim(),
+        portfolio: document.getElementById("portfolio").value.trim() || null,
+        privacy: document.getElementById("privacy").checked,
+
+        // Aufgabe 4: Status Default (Spalte in NocoDB anlegen)
+        status: "Eingegangen",
+
+        // CV (pragmatisch): nur Dateiname speichern
+        cv_filename: cvFile ? cvFile.name : null
+      };
+
+      try {
+        const res = await fetch(`${NOCODB_URL}/api/v2/tables/${TABLE_ID}/records`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "xc-auth": NOCODB_TOKEN
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const txt = await res.text();
+          throw new Error(`NocoDB Fehler: ${res.status} ${txt}`);
+        }
+
+        alert("Bewerbung wurde gespeichert ✅");
+        form.reset();
+        form.classList.remove("was-validated");
+
+      } catch (err) {
+        console.error(err);
+        alert("Speichern fehlgeschlagen ❌ (siehe Console)");
+      }
+    });
   </script>
   <script>
     fetch('nav.html')
