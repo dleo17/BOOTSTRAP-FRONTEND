@@ -393,7 +393,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
   <script>
-    // Bootstrap-Style Validation (nur Styling; Submit-Handling macht der NocoDB-Handler unten)
+    // Bootstrap-Style Validation (nur Styling; Submit-Handling macht der Firebase-Handler unten)
     (() => {
       "use strict";
       const forms = document.querySelectorAll(".needs-validation");
@@ -404,18 +404,51 @@
       });
     })();
   </script>
-  <script>
-    // ==== NocoDB: Bewerbung via API speichern (Localhost Demo) ====
-    const NOCODB_URL = "http://localhost:8080";
-    const TABLE_ID = "mos0tr7xuwtwgp6";
-    const NOCODB_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imxlb25hcmQuZGVsbW9uaWNvQGxlcm5lbmRlLmJidy5jaCIsImlkIjoidXNvNTBjODdoMm03c2JtZSIsInJvbGVzIjp7Im9yZy1sZXZlbC1jcmVhdG9yIjp0cnVlLCJzdXBlciI6dHJ1ZX0sInRva2VuX3ZlcnNpb24iOiI3MWY2MGE0M2M0NWFlZmNhNzc2ZWMxOWUwNjZmOTlmOGE2NjQzMTZlYjNhYzUzNGJkODAzYTgzMjZiYTYwNWMzMTJjOTJhZGYyYzRhZWM3MCIsImlhdCI6MTc2ODM5Nzk3MywiZXhwIjoxNzY4NDMzOTczfQ.XrOcRkopMDDYtH8sj8RbdTo-AWBP6xhQPW65dqHx-Rs";
+  <script type="module">
+    // ==== Firebase: Bewerbung speichern (Firestore + Storage) ====
+    // Wichtig:
+    // 1) In Firebase Console -> Firestore Database und Storage aktivieren.
+    // 2) Für Demo: Regeln im Testmodus (später härten).
 
-    // Kleiner Hinweis für die Konsole (hilft beim Debuggen)
-    if (location.protocol === "https:" && NOCODB_URL.startsWith("http://")) {
-      console.warn("Mixed Content: Deine Seite läuft über https, aber NocoDB ist http (localhost). Das wird im Browser blockiert. Nutze lokal http oder hoste NocoDB über https.");
-    }
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
+    import { getFirestore, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-storage.js";
+
+    // Firebase-Konfiguration (aus deiner Firebase Web-App)
+    const firebaseConfig = {
+      apiKey: "AIzaSyD-RF0L27hfVvSDmsXI2U4vnPSRpNjJFQlw",
+      authDomain: "website1-e10d5.firebaseapp.com",
+      projectId: "website1-e10d5",
+      storageBucket: "website1-e10d5.firebasestorage.app",
+      messagingSenderId: "522686025252",
+      appId: "1:522686025252:web:9d1374476fb1202f7392b1",
+      measurementId: "G-27PKVDJPKP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
 
     const form = document.getElementById("applyForm");
+
+    // kleine UX-Helfer
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalBtnText = submitBtn ? submitBtn.innerHTML : "";
+
+    function setLoading(isLoading) {
+      if (!submitBtn) return;
+      submitBtn.disabled = isLoading;
+      submitBtn.innerHTML = isLoading
+        ? '⏳ Sende Bewerbung...'
+        : originalBtnText;
+    }
+
+    function genderToLabel(val) {
+      return val === "w" ? "Weiblich" :
+             val === "m" ? "Männlich" :
+             val === "d" ? "Divers" :
+             val === "kA" ? "Keine Angabe" : "";
+    }
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
@@ -427,78 +460,80 @@
         return;
       }
 
-      // Werte sammeln
-      const cvFile = document.getElementById("cv").files?.[0] || null;
-
-      // Mappe die Form-Felder auf die *Spaltennamen* in NocoDB.
-      // Wichtig: NocoDB speichert nur Werte, deren Keys exakt den Feld-/Spaltennamen entsprechen.
-      // In deiner Tabelle heissen die Spalten z.B. "Geschlecht", "Vorname", "Nachname", "Strasse und Nr." usw.
-
-      const genderVal = document.getElementById("gender").value;
-      const genderLabel = genderVal === "w" ? "Weiblich" :
-                          genderVal === "m" ? "Männlich" :
-                          genderVal === "d" ? "Divers" :
-                          genderVal === "kA" ? "Keine Angabe" : "";
-
-      const firstname = document.getElementById("firstname").value.trim();
-      const lastname  = document.getElementById("lastname").value.trim();
-
-      // "Title" ist in NocoDB oft die Primary-Column (Default). Wenn sie existiert, setze sie mit.
-      const payload = {
-        "Title": `${firstname} ${lastname}`.trim(),
-
-        "Geschlecht": genderLabel,
-        "Vorname": firstname,
-        "Nachname": lastname,
-        "Strasse und Nr.": document.getElementById("street").value.trim(),
-        "PLZ und Ort": document.getElementById("zipcity").value.trim(),
-        "Geburtsdatum": document.getElementById("birthdate").value, // YYYY-MM-DD
-
-        // Falls diese Spalten in NocoDB existieren, werden sie befüllt; sonst werden sie ignoriert.
-        "E-Mail": document.getElementById("email").value.trim(),
-        "Handy-Nummer": document.getElementById("phone").value.trim(),
-        "Bevorzugte Art der Kontaktaufnahme": document.getElementById("contactPref").value,
-        "Motivationsschreiben": document.getElementById("motivation").value.trim(),
-        "Link zu Portfolio": (document.getElementById("portfolio").value.trim() || null),
-        "Datenschutz akzeptiert": document.getElementById("privacy").checked,
-
-        // Aufgabe 4: Status Default (Spalte in NocoDB anlegen)
-        "Status": "Eingegangen",
-
-        // CV (pragmatisch): nur Dateiname speichern (Spalte in NocoDB anlegen)
-        "Lebenslauf (Dateiname)": (cvFile ? cvFile.name : null)
-      };
+      setLoading(true);
 
       try {
-        const res = await fetch(`${NOCODB_URL}/api/v2/tables/${TABLE_ID}/records`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            // Wenn du in NocoDB eine API Key bekommst, kannst du statt xc-auth auch xc-token verwenden.
-            // Lass xc-auth wie es ist, wenn dein auto-generierter Code xc-auth zeigt.
-            "xc-auth": NOCODB_TOKEN
-            // "xc-token": NOCODB_TOKEN
-          },
-          body: JSON.stringify(payload)
-        });
+        // Werte sammeln
+        const genderVal = document.getElementById("gender").value;
+        const firstname = document.getElementById("firstname").value.trim();
+        const lastname  = document.getElementById("lastname").value.trim();
+        const street    = document.getElementById("street").value.trim();
+        const zipcity   = document.getElementById("zipcity").value.trim();
+        const birthdate = document.getElementById("birthdate").value; // YYYY-MM-DD
+        const email     = document.getElementById("email").value.trim();
+        const phone     = document.getElementById("phone").value.trim();
+        const contactPref = document.getElementById("contactPref").value;
+        const motivation  = document.getElementById("motivation").value.trim();
+        const portfolio   = document.getElementById("portfolio").value.trim() || null;
+        const privacyAccepted = document.getElementById("privacy").checked;
 
-        if (!res.ok) {
-          console.error("NocoDB Response not ok", res.status, res.statusText);
-          const txt = await res.text();
-          throw new Error(`NocoDB Fehler: ${res.status} ${txt}`);
+        const cvFile = document.getElementById("cv").files?.[0] || null;
+        if (!cvFile) {
+          // sollte durch required eh nicht passieren
+          throw new Error("Bitte Lebenslauf (PDF) auswählen.");
         }
 
-        const raw = await res.text();
-        let json = null;
-        try { json = raw ? JSON.parse(raw) : null; } catch (_) {}
-        console.log("NocoDB create response:", json || raw);
+        // 1) PDF nach Firebase Storage hochladen
+        const safeName = `${firstname}_${lastname}`.trim().replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_\-]/g, "");
+        const ts = Date.now();
+        const storagePath = `applications/${safeName || "bewerbung"}_${ts}_${cvFile.name}`;
+        const fileRef = ref(storage, storagePath);
+
+        await uploadBytes(fileRef, cvFile, { contentType: cvFile.type || "application/pdf" });
+        const cvUrl = await getDownloadURL(fileRef);
+
+        // 2) Daten in Firestore speichern
+        const docPayload = {
+          title: `${firstname} ${lastname}`.trim(),
+
+          geschlecht: genderToLabel(genderVal),
+          vorname: firstname,
+          nachname: lastname,
+          strasse_und_nr: street,
+          plz_und_ort: zipcity,
+          geburtsdatum: birthdate,
+
+          email,
+          handy_nummer: phone,
+          kontakt_preferenz: contactPref,
+
+          motivationsschreiben: motivation,
+          portfolio_link: portfolio,
+
+          datenschutz_akzeptiert: privacyAccepted,
+
+          status: "Eingegangen", // Aufgabe 4 (Kanban/Status)
+
+          cv: {
+            filename: cvFile.name,
+            storagePath,
+            url: cvUrl
+          },
+
+          createdAt: serverTimestamp()
+        };
+
+        await addDoc(collection(db, "applications"), docPayload);
+
         alert("Bewerbung wurde gespeichert ✅");
         form.reset();
         form.classList.remove("was-validated");
 
       } catch (err) {
         console.error(err);
-        alert("Speichern fehlgeschlagen ❌ (siehe Console)");
+        alert(`Speichern fehlgeschlagen ❌\n${err?.message || err}`);
+      } finally {
+        setLoading(false);
       }
     });
   </script>
