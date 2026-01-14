@@ -406,10 +406,14 @@
   </script>
   <script>
     // ==== NocoDB: Bewerbung via API speichern (Localhost Demo) ====
-    // WICHTIG: Token nicht in ein öffentliches GitHub-Repo pushen.
     const NOCODB_URL = "http://localhost:8080";
     const TABLE_ID = "mos0tr7xuwtwgp6";
-    const NOCODB_TOKEN = "PASTE_XC_AUTH_TOKEN_HERE"; // <- hier dein xc-auth Token einfügen
+    const NOCODB_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6Imxlb25hcmQuZGVsbW9uaWNvQGxlcm5lbmRlLmJidy5jaCIsImlkIjoidXNvNTBjODdoMm03c2JtZSIsInJvbGVzIjp7Im9yZy1sZXZlbC1jcmVhdG9yIjp0cnVlLCJzdXBlciI6dHJ1ZX0sInRva2VuX3ZlcnNpb24iOiI3MWY2MGE0M2M0NWFlZmNhNzc2ZWMxOWUwNjZmOTlmOGE2NjQzMTZlYjNhYzUzNGJkODAzYTgzMjZiYTYwNWMzMTJjOTJhZGYyYzRhZWM3MCIsImlhdCI6MTc2ODM5Nzk3MywiZXhwIjoxNzY4NDMzOTczfQ.XrOcRkopMDDYtH8sj8RbdTo-AWBP6xhQPW65dqHx-Rs";
+
+    // Kleiner Hinweis für die Konsole (hilft beim Debuggen)
+    if (location.protocol === "https:" && NOCODB_URL.startsWith("http://")) {
+      console.warn("Mixed Content: Deine Seite läuft über https, aber NocoDB ist http (localhost). Das wird im Browser blockiert. Nutze lokal http oder hoste NocoDB über https.");
+    }
 
     const form = document.getElementById("applyForm");
 
@@ -426,25 +430,43 @@
       // Werte sammeln
       const cvFile = document.getElementById("cv").files?.[0] || null;
 
+      // Mappe die Form-Felder auf die *Spaltennamen* in NocoDB.
+      // Wichtig: NocoDB speichert nur Werte, deren Keys exakt den Feld-/Spaltennamen entsprechen.
+      // In deiner Tabelle heissen die Spalten z.B. "Geschlecht", "Vorname", "Nachname", "Strasse und Nr." usw.
+
+      const genderVal = document.getElementById("gender").value;
+      const genderLabel = genderVal === "w" ? "Weiblich" :
+                          genderVal === "m" ? "Männlich" :
+                          genderVal === "d" ? "Divers" :
+                          genderVal === "kA" ? "Keine Angabe" : "";
+
+      const firstname = document.getElementById("firstname").value.trim();
+      const lastname  = document.getElementById("lastname").value.trim();
+
+      // "Title" ist in NocoDB oft die Primary-Column (Default). Wenn sie existiert, setze sie mit.
       const payload = {
-        gender: document.getElementById("gender").value,
-        firstname: document.getElementById("firstname").value.trim(),
-        lastname: document.getElementById("lastname").value.trim(),
-        street: document.getElementById("street").value.trim(),
-        zipcity: document.getElementById("zipcity").value.trim(),
-        birthdate: document.getElementById("birthdate").value, // YYYY-MM-DD
-        email: document.getElementById("email").value.trim(),
-        phone: document.getElementById("phone").value.trim(),
-        contactPref: document.getElementById("contactPref").value,
-        motivation: document.getElementById("motivation").value.trim(),
-        portfolio: document.getElementById("portfolio").value.trim() || null,
-        privacy: document.getElementById("privacy").checked,
+        "Title": `${firstname} ${lastname}`.trim(),
+
+        "Geschlecht": genderLabel,
+        "Vorname": firstname,
+        "Nachname": lastname,
+        "Strasse und Nr.": document.getElementById("street").value.trim(),
+        "PLZ und Ort": document.getElementById("zipcity").value.trim(),
+        "Geburtsdatum": document.getElementById("birthdate").value, // YYYY-MM-DD
+
+        // Falls diese Spalten in NocoDB existieren, werden sie befüllt; sonst werden sie ignoriert.
+        "E-Mail": document.getElementById("email").value.trim(),
+        "Handy-Nummer": document.getElementById("phone").value.trim(),
+        "Bevorzugte Art der Kontaktaufnahme": document.getElementById("contactPref").value,
+        "Motivationsschreiben": document.getElementById("motivation").value.trim(),
+        "Link zu Portfolio": (document.getElementById("portfolio").value.trim() || null),
+        "Datenschutz akzeptiert": document.getElementById("privacy").checked,
 
         // Aufgabe 4: Status Default (Spalte in NocoDB anlegen)
-        status: "Eingegangen",
+        "Status": "Eingegangen",
 
-        // CV (pragmatisch): nur Dateiname speichern
-        cv_filename: cvFile ? cvFile.name : null
+        // CV (pragmatisch): nur Dateiname speichern (Spalte in NocoDB anlegen)
+        "Lebenslauf (Dateiname)": (cvFile ? cvFile.name : null)
       };
 
       try {
@@ -452,16 +474,24 @@
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            // Wenn du in NocoDB eine API Key bekommst, kannst du statt xc-auth auch xc-token verwenden.
+            // Lass xc-auth wie es ist, wenn dein auto-generierter Code xc-auth zeigt.
             "xc-auth": NOCODB_TOKEN
+            // "xc-token": NOCODB_TOKEN
           },
           body: JSON.stringify(payload)
         });
 
         if (!res.ok) {
+          console.error("NocoDB Response not ok", res.status, res.statusText);
           const txt = await res.text();
           throw new Error(`NocoDB Fehler: ${res.status} ${txt}`);
         }
 
+        const raw = await res.text();
+        let json = null;
+        try { json = raw ? JSON.parse(raw) : null; } catch (_) {}
+        console.log("NocoDB create response:", json || raw);
         alert("Bewerbung wurde gespeichert ✅");
         form.reset();
         form.classList.remove("was-validated");
