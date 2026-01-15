@@ -405,21 +405,18 @@
     })();
   </script>
   <script type="module">
-    // ==== Firebase: Bewerbung speichern (Firestore + Storage) ====
-    // Wichtig:
-    // 1) In Firebase Console -> Firestore Database und Storage aktivieren.
-    // 2) Für Demo: Regeln im Testmodus (später härten).
+    // ==== Firebase: Bewerbung speichern (nur Firestore, nur Text) ====
+    // Speichert die Formulardaten als Dokument in der Collection "applications".
+    // Hinweis: Ohne Storage-Upgrade wird die PDF NICHT hochgeladen – es wird nur der Dateiname gespeichert.
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
     import { getFirestore, addDoc, collection, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
-    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-storage.js";
 
     // Firebase-Konfiguration (aus deiner Firebase Web-App)
     const firebaseConfig = {
       apiKey: "AIzaSyD-RF0L27hfVvSDmsXI2U4vnPSRpNjJFQlw",
       authDomain: "website1-e10d5.firebaseapp.com",
       projectId: "website1-e10d5",
-      storageBucket: "website1-e10d5.firebasestorage.app",
       messagingSenderId: "522686025252",
       appId: "1:522686025252:web:9d1374476fb1202f7392b1",
       measurementId: "G-27PKVDJPKP"
@@ -427,7 +424,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const storage = getStorage(app);
 
     const form = document.getElementById("applyForm");
 
@@ -438,9 +434,7 @@
     function setLoading(isLoading) {
       if (!submitBtn) return;
       submitBtn.disabled = isLoading;
-      submitBtn.innerHTML = isLoading
-        ? '⏳ Sende Bewerbung...'
-        : originalBtnText;
+      submitBtn.innerHTML = isLoading ? "⏳ Sende Bewerbung..." : originalBtnText;
     }
 
     function genderToLabel(val) {
@@ -477,22 +471,14 @@
         const portfolio   = document.getElementById("portfolio").value.trim() || null;
         const privacyAccepted = document.getElementById("privacy").checked;
 
+        // PDF wird ohne Storage NICHT hochgeladen – nur Dateiname wird gespeichert
         const cvFile = document.getElementById("cv").files?.[0] || null;
         if (!cvFile) {
           // sollte durch required eh nicht passieren
           throw new Error("Bitte Lebenslauf (PDF) auswählen.");
         }
 
-        // 1) PDF nach Firebase Storage hochladen
-        const safeName = `${firstname}_${lastname}`.trim().replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_\-]/g, "");
-        const ts = Date.now();
-        const storagePath = `applications/${safeName || "bewerbung"}_${ts}_${cvFile.name}`;
-        const fileRef = ref(storage, storagePath);
-
-        await uploadBytes(fileRef, cvFile, { contentType: cvFile.type || "application/pdf" });
-        const cvUrl = await getDownloadURL(fileRef);
-
-        // 2) Daten in Firestore speichern
+        // Daten in Firestore speichern
         const docPayload = {
           title: `${firstname} ${lastname}`.trim(),
 
@@ -512,13 +498,10 @@
 
           datenschutz_akzeptiert: privacyAccepted,
 
-          status: "Eingegangen", // Aufgabe 4 (Kanban/Status)
+          status: "Eingegangen",
 
-          cv: {
-            filename: cvFile.name,
-            storagePath,
-            url: cvUrl
-          },
+          // nur Text
+          cvFilename: cvFile.name,
 
           createdAt: serverTimestamp()
         };
